@@ -1,16 +1,10 @@
-function parseKml(kml) {
-    const poles = { te: [] }; // Presuming you have a structure for poles.te
+function parseKml(kml) { ... // existing parsing logic 
 
-    const folders = kml.getElementsByTagName('Folder');
-    for (let folder of folders) {
-        const folderName = folder.getElementsByTagName('name')[0].textContent;
+ // Add new categories to TE
+ const categories = ['Existing Pole', 'T7', 'T9', 'TL']; 
 
-        // Add T7, T9, and TL as TE categories
-        if (['T7', 'T9', 'TL'].includes(folderName)) {
-            poles.te.push(folderName);
-        }
-    }
-
-    // Further parsing logic...
-    return poles;
+ // existing logic with collectPts
+ if (categories.includes(category)) {
+     collectPts();
+ }
 }
