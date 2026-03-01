@@ -251,6 +251,49 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
   .kmz-wrap { padding:1.5rem 0.8rem; }
   .sum-grid { grid-template-columns:1fr 1fr; }
 }
+
+/* ============ KMZ SPLITTER PAGE ============ */
+.split-wrap { max-width:900px; margin:0 auto; padding:2rem 1.5rem; }
+.split-upload-card { background:white; border:2px dashed var(--border2); border-radius:14px; padding:2.5rem; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; box-shadow:var(--shadow); }
+.split-upload-card:hover,.split-upload-card.drag { border-color:var(--accent); background:#eff6ff; }
+.split-upload-card input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+#splitApp { display:none; }
+.split-prog-panel { background:white; border:1px solid var(--border); border-radius:12px; padding:1.4rem; margin-bottom:1.2rem; box-shadow:var(--shadow); }
+.split-file-info { display:flex; align-items:center; gap:0.8rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+.split-fi-icon { width:34px; height:34px; background:var(--accent-light); border:1px solid #bfdbfe; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.split-fi-name { font-family:'JetBrains Mono',monospace; font-size:0.83rem; color:var(--accent); font-weight:600; }
+.split-fi-size { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); }
+.split-prog-label { font-size:0.72rem; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-bottom:0.35rem; display:flex; justify-content:space-between; }
+.split-prog-wrap { height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:0.9rem; }
+.split-prog-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:3px; width:0%; transition:width 0.3s; }
+.split-log { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; font-family:'JetBrains Mono',monospace; font-size:0.73rem; max-height:150px; overflow-y:auto; line-height:1.7; }
+.split-log .lok { color:var(--green); } .split-log .linf { color:var(--accent); } .split-log .lerr { color:var(--red); }
+.split-result-panel { display:none; }
+.split-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:0.8rem; margin-bottom:1.2rem; }
+.split-stat { background:white; border:1px solid var(--border); border-radius:10px; padding:0.8rem 1rem; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+.split-stat::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.split-stat.ss1::before { background:var(--accent); } .split-stat.ss2::before { background:var(--green); } .split-stat.ss3::before { background:var(--yellow); } .split-stat.ss4::before { background:#7c3aed; } .split-stat.ss5::before { background:#c2410c; }
+.split-snum { font-size:1.5rem; font-weight:800; font-family:'JetBrains Mono',monospace; line-height:1; margin-bottom:0.2rem; }
+.split-stat.ss1 .split-snum { color:var(--accent); } .split-stat.ss2 .split-snum { color:var(--green); } .split-stat.ss3 .split-snum { color:var(--yellow); } .split-stat.ss4 .split-snum { color:#7c3aed; } .split-stat.ss5 .split-snum { color:#c2410c; }
+.split-slbl { font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; }
+.split-seg-table-wrap { background:white; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:1.2rem; box-shadow:var(--shadow); overflow-x:auto; }
+.split-seg-table-wrap table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+.split-seg-table-wrap thead tr { background:var(--table-head); }
+.split-seg-table-wrap th { padding:0.65rem 0.9rem; color:#94a3b8; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.07em; font-weight:600; text-align:left; font-family:'JetBrains Mono',monospace; }
+.split-seg-table-wrap th.r { text-align:right; }
+.split-seg-table-wrap tbody tr { border-top:1px solid var(--border); transition:background 0.15s; }
+.split-seg-table-wrap tbody tr:hover { background:#eff6ff; }
+.split-seg-table-wrap td { padding:0.6rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.78rem; }
+.split-seg-table-wrap td.r { text-align:right; }
+.split-seg-name { color:var(--accent); font-weight:600; }
+.badge-colo-s { display:inline-block; background:#dcfce7; border:1px solid #86efac; color:var(--green); font-size:0.58rem; font-weight:700; padding:0.08rem 0.4rem; border-radius:4px; margin-left:0.35rem; }
+.btn-split-dl { width:100%; background:var(--accent); color:white; border:none; padding:0.8rem 2rem; border-radius:10px; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow:0 2px 8px rgba(30,64,175,0.25); }
+.btn-split-dl:hover { background:#1d4ed8; transform:translateY(-1px); }
+.split-action-row { display:flex; gap:0.8rem; align-items:center; }
+.split-action-row .btn-split-dl { flex:1; }
+.split-err-box { background:var(--red-light); border:1px solid #fca5a5; border-radius:10px; padding:0.9rem 1.3rem; color:var(--red); font-size:0.85rem; margin-bottom:1.2rem; display:none; }
+@media(max-width:600px){ .split-wrap { padding:1.5rem 0.8rem; } .split-stats { grid-template-columns:1fr 1fr; } }
+
 </style>
 </head>
 <body>
@@ -267,6 +310,7 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
   <div style="display:flex;align-items:stretch">
     <div class="tab-nav">
       <button class="tab-btn active" id="tab-kmz" onclick="switchTab('kmz')">🗺️ KMZ Counter</button>
+      <button class="tab-btn" id="tab-split" onclick="switchTab('split')">✂️ KMZ Splitter</button>
       <button class="tab-btn" id="tab-boq" onclick="switchTab('boq')">📋 BOQ Calculator</button>
     </div>
     <div class="topbar-actions" id="boqActions" style="display:none">
@@ -379,6 +423,83 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
 </div>
 </div>
 
+
+
+<!-- ======================================================= -->
+<!-- PAGE: KMZ SPLITTER                                      -->
+<!-- ======================================================= -->
+<div class="page" id="page-split">
+<div class="split-wrap">
+
+  <div class="split-upload-card" id="splitDropZone">
+    <input type="file" id="splitFileInput" accept=".kmz,.kml">
+    <div class="upload-icon">📦</div>
+    <p><strong>Drop file .KMZ atau .KML di sini</strong><br>atau klik untuk memilih file</p>
+    <div style="margin-top:0.6rem;font-size:0.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace">
+      Otomatis split per segmen New Cable → download KMZ baru
+    </div>
+  </div>
+
+  <div id="splitApp">
+    <div class="kmz-bar">
+      <div class="file-badge">
+        <span>📦</span>
+        <span class="fn" id="splitFileName">-</span>
+        <span class="fs" id="splitFileSize">-</span>
+      </div>
+      <button class="btn-reset" onclick="resetSplit()">↩ Ganti File</button>
+    </div>
+
+    <div id="splitErrBox" class="split-err-box"></div>
+
+    <!-- Progress -->
+    <div class="split-prog-panel" id="splitProgPanel" style="display:none">
+      <div class="split-prog-label">
+        <span id="splitProgStep">Memproses...</span>
+        <span id="splitProgPct">0%</span>
+      </div>
+      <div class="split-prog-wrap"><div class="split-prog-bar" id="splitProgBar"></div></div>
+      <div class="split-log" id="splitLog"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="splitResultPanel" style="display:none">
+      <div class="kmz-bar" style="margin-bottom:1rem">
+        <div class="sec-ttl" style="margin:0;flex:1">✅ Selesai — Siap diunduh</div>
+      </div>
+      <div class="split-stats">
+        <div class="split-stat ss1"><div class="split-snum" id="sstSeg">-</div><div class="split-slbl">Segmen</div></div>
+        <div class="split-stat ss2"><div class="split-snum" id="sstP7">-</div><div class="split-slbl">Pole 7m</div></div>
+        <div class="split-stat ss3"><div class="split-snum" id="sstP9">-</div><div class="split-slbl">Pole 9m</div></div>
+        <div class="split-stat ss4"><div class="split-snum" id="sstHg">-</div><div class="split-slbl">Hanger</div></div>
+        <div class="split-stat ss5"><div class="split-snum" id="sstOdp">-</div><div class="split-slbl">ODP</div></div>
+      </div>
+      <div class="sec-ttl">Detail Per Segmen</div>
+      <div class="split-seg-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Segmen Route</th>
+              <th class="r">Hanger</th>
+              <th class="r">Pole 7</th>
+              <th class="r">Pole 9</th>
+              <th class="r">Ex.Pole</th>
+              <th class="r">ODP</th>
+            </tr>
+          </thead>
+          <tbody id="splitSegBody"></tbody>
+        </table>
+      </div>
+      <div class="split-action-row">
+        <button class="btn-split-dl" id="btnSplitDl">⬇ Download KMZ Per Segmen</button>
+        <button class="btn-reset" onclick="resetSplit()">↩ Upload Baru</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
 
 <!-- ======================================================= -->
 <!-- PAGE: BOQ CALCULATOR                                    -->
@@ -1046,6 +1167,337 @@ function exportCSV(){
 
 renderRoutes();
 recalc();
+
+// ═══════════════════════════════════════════════════
+// KMZ SPLITTER
+// ═══════════════════════════════════════════════════
+(function(){
+
+let _splitBlob = null;
+let _splitOutputName = '';
+
+const splitDropZone  = document.getElementById('splitDropZone');
+const splitFileInput = document.getElementById('splitFileInput');
+
+splitDropZone.addEventListener('dragover',  e => { e.preventDefault(); splitDropZone.classList.add('drag'); });
+splitDropZone.addEventListener('dragleave', () => splitDropZone.classList.remove('drag'));
+splitDropZone.addEventListener('drop', e => { e.preventDefault(); splitDropZone.classList.remove('drag'); handleSplitFile(e.dataTransfer.files[0]); });
+splitFileInput.addEventListener('change', e => handleSplitFile(e.target.files[0]));
+
+function resetSplit() {
+  _splitBlob = null;
+  document.getElementById('splitDropZone').style.display = 'block';
+  document.getElementById('splitApp').style.display = 'none';
+  document.getElementById('splitErrBox').style.display = 'none';
+  document.getElementById('splitProgPanel').style.display = 'none';
+  document.getElementById('splitResultPanel').style.display = 'none';
+  document.getElementById('splitLog').innerHTML = '';
+  splitFileInput.value = '';
+}
+window.resetSplit = resetSplit;
+
+function sLog(msg, cls='linf') {
+  const box = document.getElementById('splitLog');
+  const d = document.createElement('div');
+  d.className = cls;
+  d.textContent = '› ' + msg;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+function sProgress(pct, step) {
+  document.getElementById('splitProgBar').style.width = pct + '%';
+  document.getElementById('splitProgPct').textContent = pct + '%';
+  if (step) document.getElementById('splitProgStep').textContent = step;
+}
+function showSplitErr(msg) {
+  const el = document.getElementById('splitErrBox');
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('splitProgPanel').style.display = 'none';
+}
+
+async function handleSplitFile(file) {
+  if (!file) return;
+  document.getElementById('splitDropZone').style.display = 'none';
+  document.getElementById('splitApp').style.display = 'block';
+  document.getElementById('splitErrBox').style.display = 'none';
+  document.getElementById('splitProgPanel').style.display = 'block';
+  document.getElementById('splitResultPanel').style.display = 'none';
+  document.getElementById('splitLog').innerHTML = '';
+  document.getElementById('splitFileName').textContent = file.name;
+  document.getElementById('splitFileSize').textContent = (file.size/1024).toFixed(1) + ' KB';
+  _splitOutputName = file.name.replace(/\.(kmz|kml)$/i,'') + '_per_segmen.kmz';
+
+  try {
+    sProgress(5, 'Membaca file...');
+    sLog('Membaca: ' + file.name);
+    let kmlText;
+    if (file.name.toLowerCase().endsWith('.kmz')) {
+      const zip = await JSZip.loadAsync(file);
+      const kf = Object.values(zip.files).find(f => f.name.endsWith('.kml'));
+      if (!kf) throw new Error('Tidak ada file KML di dalam KMZ.');
+      kmlText = await kf.async('string');
+    } else {
+      kmlText = await file.text();
+    }
+    sLog('File terbaca (' + (kmlText.length/1024).toFixed(1) + ' KB)');
+
+    sProgress(15, 'Parsing KML...');
+    const kmlData = parseSplitKml(kmlText);
+    sLog('Ditemukan ' + kmlData.nc_segments.length + ' segmen New Cable', 'lok');
+    if (kmlData.nc_segments.length === 0) throw new Error('Folder "New Cable" tidak ditemukan atau kosong.');
+
+    sProgress(30, 'Assign titik ke segmen...');
+    await new Promise(r => setTimeout(r, 10));
+    const assigned = assignSplitAll(kmlData);
+    sLog('Assignment selesai', 'lok');
+
+    sProgress(60, 'Membangun KMZ baru...');
+    await new Promise(r => setTimeout(r, 10));
+    const newKmlStr = buildSplitKml(kmlData, assigned);
+
+    sProgress(85, 'Mengemas file...');
+    await new Promise(r => setTimeout(r, 10));
+    const zipOut = new JSZip();
+    zipOut.file('doc.kml', newKmlStr);
+    _splitBlob = await zipOut.generateAsync({ type:'blob', compression:'DEFLATE' });
+    sLog('KMZ siap (' + (_splitBlob.size/1024).toFixed(1) + ' KB)', 'lok');
+
+    sProgress(100, 'Selesai!');
+    await new Promise(r => setTimeout(r, 200));
+    showSplitResult(kmlData, assigned);
+
+  } catch(err) {
+    sLog('ERROR: ' + err.message, 'lerr');
+    showSplitErr(err.message);
+  }
+}
+
+// ── Parser ──
+function parseSplitKml(raw) {
+  raw = raw.replace(/<(\w+:)/g,'<').replace(/<\/(\w+:)/g,'</');
+  raw = raw.replace(/\s+xmlns(?::\w+)?="[^"]*"/g,'');
+  raw = raw.replace(/\s+\w+:\w+="[^"]*"/g,'');
+  const xml = new DOMParser().parseFromString(raw, 'text/xml');
+  if (xml.querySelector('parsererror')) throw new Error('File KML tidak valid / corrupt.');
+
+  function gname(el) {
+    for (const t of ['name','n']) { const c=el.querySelector(':scope > '+t); if(c&&c.textContent.trim()) return c.textContent.trim(); }
+    return '';
+  }
+  function findF(parent,kw) {
+    for (const f of parent.querySelectorAll(':scope > Folder'))
+      if (gname(f).toLowerCase().includes(kw.toLowerCase())) return f;
+    return null;
+  }
+  function parseC(s){ const p=s.trim().split(','); return p.length>=2?[parseFloat(p[0]),parseFloat(p[1])]:null; }
+  function pcoords(ce){ return ce.textContent.trim().split(/\s+/).map(parseC).filter(Boolean); }
+
+  const docEl = xml.querySelector('Document');
+  let mainF = null;
+  for (const f of docEl.querySelectorAll(':scope > Folder')) {
+    if (findF(f,'Route')) { mainF=f; break; }
+  }
+  if (!mainF) mainF = docEl;
+  const mainName = gname(mainF) || 'KMZ Output';
+
+  const routeF = findF(mainF,'Route');
+  if (!routeF) throw new Error('Folder "Route" tidak ditemukan.');
+  const ncF  = findF(routeF,'New Cable');
+  if (!ncF)  throw new Error('Folder "New Cable" tidak ditemukan.');
+  const cpF  = findF(routeF,'Colo Pole');
+  const closeF = findF(mainF,'Closure');
+  const poleF  = findF(mainF,'Pole');
+  const newPF  = poleF ? findF(poleF,'New Pole') : null;
+  const exPF   = poleF ? findF(poleF,'Existing Pole') : null;
+
+  function collectLines(folder) {
+    if (!folder) return [];
+    const res = [];
+    for (const pm of folder.querySelectorAll(':scope > Placemark')) {
+      const ls = pm.querySelector('LineString');
+      const ce = ls ? ls.querySelector('coordinates') : null;
+      if (ce) { const pts=pcoords(ce); if(pts.length>1) res.push({name:gname(pm),pts,xmlStr:pm.outerHTML}); }
+    }
+    return res;
+  }
+  function collectPts(folder) {
+    if (!folder) return [];
+    const res = [];
+    for (const pm of folder.querySelectorAll(':scope > Placemark')) {
+      const ce = pm.querySelector('coordinates');
+      if (ce) { const pt=parseC(ce.textContent.trim().split(/\s+/)[0]); if(pt) res.push({name:gname(pm),coord:pt,xmlStr:pm.outerHTML}); }
+    }
+    return res;
+  }
+  function getSubFolder(parent, name) {
+    if (!parent) return null;
+    for (const f of parent.querySelectorAll(':scope > Folder')) if(gname(f)===name) return f;
+    return null;
+  }
+
+  const styleXml = [];
+  for (const el of docEl.children) { if(el.tagName==='Style'||el.tagName==='StyleMap') styleXml.push(el.outerHTML); }
+
+  return {
+    mainName, styleXml,
+    nc_segments: collectLines(ncF),
+    colo_segs:   collectLines(cpF),
+    sites:       collectPts(findF(mainF,'Site')),
+    hangers:     collectPts(findF(mainF,'Hanger')),
+    pole7:       collectPts(getSubFolder(newPF,'Pole 7')),
+    pole9:       collectPts(getSubFolder(newPF,'Pole 9')),
+    sisip7:      collectPts(getSubFolder(newPF,'Sisip Pole 7')),
+    sisip9:      collectPts(getSubFolder(newPF,'Sisip Pole 9')),
+    rep7:        collectPts(getSubFolder(newPF,'Replace Pole 7')),
+    rep9:        collectPts(getSubFolder(newPF,'Replace Pole 9')),
+    exPole:      collectPts(exPF),
+    odp:         collectPts(findF(mainF,'ODP')),
+    otb:         collectPts(findF(mainF,'OTB')),
+    handhole:    collectPts(findF(mainF,'Handhole')),
+    newClosure:  collectPts(closeF ? getSubFolder(closeF,'New Closure') : null),
+    exClosure:   collectPts(closeF ? getSubFolder(closeF,'Existing Closure') : null),
+    rawMainFolder: mainF.outerHTML,
+    rawRoute:    routeF   ? routeF.outerHTML   : null,
+    rawClosure:  closeF   ? closeF.outerHTML   : null,
+    rawSite:     findF(mainF,'Site')    ? findF(mainF,'Site').outerHTML    : null,
+    rawHanger:   findF(mainF,'Hanger')  ? findF(mainF,'Hanger').outerHTML  : null,
+    rawOtb:      findF(mainF,'OTB')     ? findF(mainF,'OTB').outerHTML     : null,
+    rawPole:     poleF    ? poleF.outerHTML    : null,
+    rawOdp:      findF(mainF,'ODP')     ? findF(mainF,'ODP').outerHTML     : null,
+    rawHandhole: findF(mainF,'Handhole')? findF(mainF,'Handhole').outerHTML: null,
+  };
+}
+
+// ── Spatial ──
+const _D2M = 111320;
+function _segD(px,py,ax,ay,bx,by){ const dx=bx-ax,dy=by-ay; if(!dx&&!dy) return Math.hypot(px-ax,py-ay); let t=((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy); t=Math.max(0,Math.min(1,t)); return Math.hypot(px-(ax+t*dx),py-(ay+t*dy)); }
+function _polyD(pt,pts){ let m=Infinity; for(let i=0;i<pts.length-1;i++){const d=_segD(pt[0],pt[1],pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1]);if(d<m)m=d;} return m*_D2M; }
+function _assign(list, segs, tol=80){ const a=segs.map(()=>[]); for(const x of list){let bd=Infinity,bi=-1; for(let i=0;i<segs.length;i++){const d=_polyD(x.coord,segs[i].pts);if(d<bd){bd=d;bi=i;}} if(bi>=0&&bd<=tol)a[bi].push(x);} return a; }
+
+function assignSplitAll(data) {
+  const segs = data.nc_segments;
+  const aColo = segs.map(()=>[]);
+  for(const cs of data.colo_segs) for(let i=0;i<segs.length;i++) if(segs[i].name===cs.name){aColo[i].push(cs);break;}
+  const aSites = segs.map(()=>[]);
+  for(const st of data.sites) for(let i=0;i<segs.length;i++) if(segs[i].name.split(';').includes(st.name)){aSites[i].push(st);break;}
+  const aOdp = segs.map(()=>[]);
+  for(const odp of data.odp){
+    let m=false;
+    for(let i=0;i<segs.length&&!m;i++) for(const p of segs[i].name.split(';')) if(odp.name.includes(p)){aOdp[i].push(odp);m=true;break;}
+    if(!m){let bd=Infinity,bi=-1; for(let i=0;i<segs.length;i++){const d=_polyD(odp.coord,segs[i].pts);if(d<bd){bd=d;bi=i;}} if(bi>=0)aOdp[bi].push(odp);}
+  }
+  return {
+    colo:aColo, sites:aSites, odp:aOdp,
+    hanger:  _assign(data.hangers,  segs),
+    pole7:   _assign(data.pole7,    segs),
+    pole9:   _assign(data.pole9,    segs),
+    sisip7:  _assign(data.sisip7,   segs),
+    sisip9:  _assign(data.sisip9,   segs),
+    rep7:    _assign(data.rep7,     segs),
+    rep9:    _assign(data.rep9,     segs),
+    exPole:  _assign(data.exPole,   segs),
+    otb:     _assign(data.otb,      segs),
+    handhole:_assign(data.handhole, segs),
+    newClosure:_assign(data.newClosure,segs),
+    exClosure: _assign(data.exClosure, segs),
+  };
+}
+
+// ── Build KML ──
+function buildSplitKml(data, assigned) {
+  const segs = data.nc_segments;
+  function ex(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fdr(name,...ch){ return `<Folder><name>${ex(name)}</name>${ch.join('')}</Folder>`; }
+  function fixN(xmlStr,n){ return xmlStr.replace(/<name>[^<]*<\/name>/,`<name>${ex(n)}<\/name>`); }
+  function pms(arr){ return arr.map(x=>x.xmlStr).join(''); }
+
+  function buildSeg(i) {
+    const seg = segs[i];
+    const disp = seg.name.replace(/;/g,'<>');
+    return fdr(disp,
+      fdr('Route',
+        fdr('New Cable', fixN(seg.xmlStr,disp)),
+        fdr('Colo Pole', pms(assigned.colo[i])),
+        fdr('Colo Cable'), fdr('UG Cable'), fdr('Colo Pole Rektifikasi'), fdr('New cable Rektifikasi')
+      ),
+      fdr('Closure', fdr('New Closure',pms(assigned.newClosure[i])), fdr('Existing Closure',pms(assigned.exClosure[i]))),
+      fdr('Site',     pms(assigned.sites[i])),
+      fdr('Hanger',   pms(assigned.hanger[i])),
+      fdr('OTB',      pms(assigned.otb[i])),
+      fdr('Pole',
+        fdr('New Pole',
+          fdr('Pole 7',        pms(assigned.pole7[i])),
+          fdr('Pole 9',        pms(assigned.pole9[i])),
+          fdr('Sisip Pole 7',  pms(assigned.sisip7[i])),
+          fdr('Sisip Pole 9',  pms(assigned.sisip9[i])),
+          fdr('Replace Pole 7',pms(assigned.rep7[i])),
+          fdr('Replace Pole 9',pms(assigned.rep9[i]))
+        ),
+        fdr('Existing Pole', pms(assigned.exPole[i]))
+      ),
+      fdr('ODP',      pms(assigned.odp[i])),
+      fdr('Handhole', pms(assigned.handhole[i]))
+    );
+  }
+
+  // Original folders
+  const origFolders = [data.rawRoute,data.rawClosure,data.rawSite,data.rawHanger,
+    data.rawOtb,data.rawPole,data.rawOdp,data.rawHandhole].filter(Boolean).join('');
+
+  // Seg 0 inside main folder, rest at Document level
+  const mainFolder = `<Folder><name>${ex(data.mainName)}</name>${origFolders}${buildSeg(0)}</Folder>`;
+  const restSegs = segs.slice(1).map((_,idx)=>buildSeg(idx+1)).join('');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<name>${ex(data.mainName)}</name>
+${data.styleXml.join('')}
+${mainFolder}
+${restSegs}
+</Document>
+</kml>`;
+}
+
+// ── Show result ──
+function showSplitResult(data, assigned) {
+  const segs = data.nc_segments;
+  document.getElementById('sstSeg').textContent = segs.length;
+  document.getElementById('sstP7').textContent  = assigned.pole7.reduce((a,b)=>a+b.length,0);
+  document.getElementById('sstP9').textContent  = assigned.pole9.reduce((a,b)=>a+b.length,0);
+  document.getElementById('sstHg').textContent  = assigned.hanger.reduce((a,b)=>a+b.length,0);
+  document.getElementById('sstOdp').textContent = assigned.odp.reduce((a,b)=>a+b.length,0);
+
+  const tb = document.getElementById('splitSegBody');
+  tb.innerHTML = '';
+  segs.forEach((seg,i) => {
+    const disp = seg.name.replace(/;/g,'<>');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-size:0.73rem">${i+1}</td>
+      <td><span class="split-seg-name">${disp}</span>${assigned.colo[i].length?'<span class="badge-colo-s">Colo</span>':''}</td>
+      <td class="r">${assigned.hanger[i].length}</td>
+      <td class="r" style="color:var(--green);font-weight:600">${assigned.pole7[i].length}</td>
+      <td class="r" style="color:var(--yellow);font-weight:600">${assigned.pole9[i].length}</td>
+      <td class="r">${assigned.exPole[i].length}</td>
+      <td class="r" style="color:#c2410c;font-weight:600">${assigned.odp[i].length}</td>`;
+    tb.appendChild(tr);
+  });
+
+  document.getElementById('splitProgPanel').style.display = 'none';
+  document.getElementById('splitResultPanel').style.display = 'block';
+
+  document.getElementById('btnSplitDl').onclick = () => {
+    const url = URL.createObjectURL(_splitBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = _splitOutputName; a.click();
+    URL.revokeObjectURL(url);
+  };
+}
+
+})(); // end IIFE
+
 </script>
 </body>
 </html>
