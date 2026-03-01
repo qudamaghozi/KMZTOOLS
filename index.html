@@ -715,17 +715,40 @@ function kmlName(el) {
 function parseKml(xml) {
   const data = { routes:[], poles:{p7:[],p9:[],te:[]}, hangers:[] };
 
-  function findFolder(root, kw) {
-    for (const f of root.querySelectorAll('Folder'))
+  // Cari folder HANYA di main folder (level Route/Hanger/Pole), bukan deep search
+  // agar tidak ikut membaca folder yang sama di dalam per-segmen
+  function findMainFolder(kw) {
+    // Cari Document > Folder (main) > Folder (target)
+    const doc = xml.querySelector('Document') || xml;
+    for (const top of doc.querySelectorAll(':scope > Folder')) {
+      // Cek apakah ini main folder (berisi Route)
+      for (const f of top.querySelectorAll(':scope > Folder'))
+        if (kmlName(f).toLowerCase().includes(kw.toLowerCase())) return f;
+      // Fallback: jika kw ada langsung di Document level
+      if (kmlName(top).toLowerCase().includes(kw.toLowerCase())) return top;
+    }
+    // Last resort: document langsung
+    const doc2 = xml.querySelector('Document') || xml;
+    for (const f of doc2.querySelectorAll(':scope > Folder'))
       if (kmlName(f).toLowerCase().includes(kw.toLowerCase())) return f;
     return null;
   }
+
+  // Khusus untuk sub-folder bersarang (Pole > New Pole > Pole 7)
+  function findNestedFolder(parentKw, childKw) {
+    const parent = findMainFolder(parentKw);
+    if (!parent) return null;
+    for (const f of parent.querySelectorAll(':scope > Folder, :scope > Folder > Folder'))
+      if (kmlName(f).toLowerCase().includes(childKw.toLowerCase())) return f;
+    return null;
+  }
+
   function parseCoord(s) {
     const p = s.trim().split(',');
     return p.length >= 2 ? [parseFloat(p[0]),parseFloat(p[1])] : null;
   }
 
-  // Routes from New Cable, Colo Cable, Colo Pole (LineString)
+  // Routes — hanya dari direct children folder, bukan nested
   function collectRoutes(folder, type) {
     if (!folder) return;
     for (const pm of folder.querySelectorAll(':scope > Placemark')) {
@@ -737,9 +760,9 @@ function parseKml(xml) {
       }
     }
   }
-  collectRoutes(findFolder(xml,'New Cable'), 'new_cable');
-  collectRoutes(findFolder(xml,'Colo Cable'), 'collo_cable');
-  collectRoutes(findFolder(xml,'Colo Pole'), 'collo_pole');
+  collectRoutes(findMainFolder('New Cable'), 'new_cable');
+  collectRoutes(findMainFolder('Colo Cable'), 'collo_cable');
+  collectRoutes(findMainFolder('Colo Pole'), 'collo_pole');
   if (data.routes.length === 0) {
     for (const pm of xml.querySelectorAll('Placemark')) {
       const ls = pm.querySelector('LineString');
@@ -753,19 +776,20 @@ function parseKml(xml) {
     }
   }
 
+  // Kumpulkan titik hanya dari direct Placemark di folder (bukan nested)
   function collectPts(folder) {
     const res = [];
     if (!folder) return res;
-    for (const pm of folder.querySelectorAll('Placemark')) {
+    for (const pm of folder.querySelectorAll(':scope > Placemark')) {
       const ce = pm.querySelector('coordinates');
       if (ce) ce.textContent.trim().split(/\s+/).map(parseCoord).filter(Boolean).forEach(p => res.push(p));
     }
     return res;
   }
-  data.poles.p7 = collectPts(findFolder(xml,'Pole 7'));
-  data.poles.p9 = collectPts(findFolder(xml,'Pole 9'));
-  data.poles.te = collectPts(findFolder(xml,'Existing Pole'));
-  data.hangers  = collectPts(findFolder(xml,'Hanger'));
+  data.poles.p7 = collectPts(findNestedFolder('Pole','Pole 7'));
+  data.poles.p9 = collectPts(findNestedFolder('Pole','Pole 9'));
+  data.poles.te = collectPts(findNestedFolder('Pole','Existing Pole'));
+  data.hangers  = collectPts(findMainFolder('Hanger'));
   return data;
 }
 
@@ -1244,8 +1268,10 @@ async function handleSplitFile(file) {
 
     sProgress(15, 'Parsing KML...');
     const kmlData = parseSplitKml(kmlText);
-    sLog('Ditemukan ' + kmlData.nc_segments.length + ' segmen New Cable', 'lok');
-    if (kmlData.nc_segments.length === 0) throw new Error('Folder "New Cable" tidak ditemukan atau kosong.');
+    const ncCount   = kmlData.nc_segments.filter(s=>s.type==='nc').length;
+    const coloCount = kmlData.nc_segments.filter(s=>s.type==='colo').length;
+    sLog(`Ditemukan ${kmlData.nc_segments.length} segmen total: ${ncCount} New Cable + ${coloCount} Colo Pole mandiri`, 'lok');
+    if (kmlData.nc_segments.length === 0) throw new Error('Tidak ada segmen ditemukan di New Cable maupun Colo Pole.');
 
     sProgress(30, 'Assign titik ke segmen...');
     await new Promise(r => setTimeout(r, 10));
@@ -1285,9 +1311,17 @@ function parseSplitKml(raw) {
     for (const t of ['name','n']) { const c=el.querySelector(':scope > '+t); if(c&&c.textContent.trim()) return c.textContent.trim(); }
     return '';
   }
+  // Cari hanya di direct children — tidak deep search supaya tidak ambil folder dari per-segmen
   function findF(parent,kw) {
+    if (!parent) return null;
     for (const f of parent.querySelectorAll(':scope > Folder'))
       if (gname(f).toLowerCase().includes(kw.toLowerCase())) return f;
+    return null;
+  }
+  function findFExact(parent,name) {
+    if (!parent) return null;
+    for (const f of parent.querySelectorAll(':scope > Folder'))
+      if (gname(f) === name) return f;
     return null;
   }
   function parseC(s){ const p=s.trim().split(','); return p.length>=2?[parseFloat(p[0]),parseFloat(p[1])]:null; }
@@ -1303,13 +1337,13 @@ function parseSplitKml(raw) {
 
   const routeF = findF(mainF,'Route');
   if (!routeF) throw new Error('Folder "Route" tidak ditemukan.');
-  const ncF  = findF(routeF,'New Cable');
+  const ncF  = findFExact(routeF,'New Cable');
   if (!ncF)  throw new Error('Folder "New Cable" tidak ditemukan.');
-  const cpF  = findF(routeF,'Colo Pole');
+  const cpF  = findFExact(routeF,'Colo Pole');
   const closeF = findF(mainF,'Closure');
-  const poleF  = findF(mainF,'Pole');
-  const newPF  = poleF ? findF(poleF,'New Pole') : null;
-  const exPF   = poleF ? findF(poleF,'Existing Pole') : null;
+  const poleF  = findFExact(mainF,'Pole');
+  const newPF  = poleF ? findFExact(poleF,'New Pole') : null;
+  const exPF   = poleF ? findFExact(poleF,'Existing Pole') : null;
 
   function collectLines(folder) {
     if (!folder) return [];
@@ -1330,42 +1364,58 @@ function parseSplitKml(raw) {
     }
     return res;
   }
-  function getSubFolder(parent, name) {
-    if (!parent) return null;
-    for (const f of parent.querySelectorAll(':scope > Folder')) if(gname(f)===name) return f;
-    return null;
-  }
 
   const styleXml = [];
   for (const el of docEl.children) { if(el.tagName==='Style'||el.tagName==='StyleMap') styleXml.push(el.outerHTML); }
 
+  const siteF    = findFExact(mainF,'Site');
+  const hangerF  = findFExact(mainF,'Hanger');
+  const otbF     = findFExact(mainF,'OTB');
+  const odpF     = findFExact(mainF,'ODP');
+  const hhF      = findFExact(mainF,'Handhole');
+
+  // Gabungkan nc_segments + colo_segs yang tidak duplikat nama
+  // Setiap segmen punya property: type = 'nc' | 'colo'
+  const rawNc   = collectLines(ncF).map(s => ({...s, type:'nc'}));
+  const rawColo = collectLines(cpF).map(s => ({...s, type:'colo'}));
+
+  // Set nama NC untuk dedup
+  const ncNames = new Set(rawNc.map(s => s.name));
+
+  // Segmen Colo yg namanya tidak ada di NC → masuk sebagai segmen mandiri (type:'colo')
+  // Segmen Colo yg namanya SAMA dengan NC → tetap jadi colo_segs (assign ke NC tsb)
+  const coloAsNC    = rawColo.filter(s => !ncNames.has(s.name));
+  const coloAsRoute = rawColo.filter(s =>  ncNames.has(s.name)); // akan di-assign ke NC
+
+  // Urutan: NC dulu, lalu Colo yang jadi segmen mandiri
+  const allSegments = [...rawNc, ...coloAsNC];
+
   return {
     mainName, styleXml,
-    nc_segments: collectLines(ncF),
-    colo_segs:   collectLines(cpF),
-    sites:       collectPts(findF(mainF,'Site')),
-    hangers:     collectPts(findF(mainF,'Hanger')),
-    pole7:       collectPts(getSubFolder(newPF,'Pole 7')),
-    pole9:       collectPts(getSubFolder(newPF,'Pole 9')),
-    sisip7:      collectPts(getSubFolder(newPF,'Sisip Pole 7')),
-    sisip9:      collectPts(getSubFolder(newPF,'Sisip Pole 9')),
-    rep7:        collectPts(getSubFolder(newPF,'Replace Pole 7')),
-    rep9:        collectPts(getSubFolder(newPF,'Replace Pole 9')),
+    nc_segments: allSegments,
+    colo_segs:   coloAsRoute, // hanya colo yang namanya sama dg NC (di-assign ke NC tsb)
+    sites:       collectPts(siteF),
+    hangers:     collectPts(hangerF),
+    pole7:       collectPts(newPF ? findFExact(newPF,'Pole 7') : null),
+    pole9:       collectPts(newPF ? findFExact(newPF,'Pole 9') : null),
+    sisip7:      collectPts(newPF ? findFExact(newPF,'Sisip Pole 7') : null),
+    sisip9:      collectPts(newPF ? findFExact(newPF,'Sisip Pole 9') : null),
+    rep7:        collectPts(newPF ? findFExact(newPF,'Replace Pole 7') : null),
+    rep9:        collectPts(newPF ? findFExact(newPF,'Replace Pole 9') : null),
     exPole:      collectPts(exPF),
-    odp:         collectPts(findF(mainF,'ODP')),
-    otb:         collectPts(findF(mainF,'OTB')),
-    handhole:    collectPts(findF(mainF,'Handhole')),
-    newClosure:  collectPts(closeF ? getSubFolder(closeF,'New Closure') : null),
-    exClosure:   collectPts(closeF ? getSubFolder(closeF,'Existing Closure') : null),
-    rawMainFolder: mainF.outerHTML,
+    odp:         collectPts(odpF),
+    otb:         collectPts(otbF),
+    handhole:    collectPts(hhF),
+    newClosure:  collectPts(closeF ? findFExact(closeF,'New Closure') : null),
+    exClosure:   collectPts(closeF ? findFExact(closeF,'Existing Closure') : null),
     rawRoute:    routeF   ? routeF.outerHTML   : null,
     rawClosure:  closeF   ? closeF.outerHTML   : null,
-    rawSite:     findF(mainF,'Site')    ? findF(mainF,'Site').outerHTML    : null,
-    rawHanger:   findF(mainF,'Hanger')  ? findF(mainF,'Hanger').outerHTML  : null,
-    rawOtb:      findF(mainF,'OTB')     ? findF(mainF,'OTB').outerHTML     : null,
+    rawSite:     siteF    ? siteF.outerHTML    : null,
+    rawHanger:   hangerF  ? hangerF.outerHTML  : null,
+    rawOtb:      otbF     ? otbF.outerHTML     : null,
     rawPole:     poleF    ? poleF.outerHTML    : null,
-    rawOdp:      findF(mainF,'ODP')     ? findF(mainF,'ODP').outerHTML     : null,
-    rawHandhole: findF(mainF,'Handhole')? findF(mainF,'Handhole').outerHTML: null,
+    rawOdp:      odpF     ? odpF.outerHTML     : null,
+    rawHandhole: hhF      ? hhF.outerHTML      : null,
   };
 }
 
@@ -1377,6 +1427,7 @@ function _assign(list, segs, tol=80){ const a=segs.map(()=>[]); for(const x of l
 
 function assignSplitAll(data) {
   const segs = data.nc_segments;
+  // Colo assign: jika nama sama persis antara colo_segs dan NC seg → masuk ke NC tsb
   const aColo = segs.map(()=>[]);
   for(const cs of data.colo_segs) for(let i=0;i<segs.length;i++) if(segs[i].name===cs.name){aColo[i].push(cs);break;}
   const aSites = segs.map(()=>[]);
@@ -1415,10 +1466,13 @@ function buildSplitKml(data, assigned) {
   function buildSeg(i) {
     const seg = segs[i];
     const disp = seg.name.replace(/;/g,'<>');
+    const isColo = seg.type === 'colo';
+    // Jika segmen dari Colo Pole → masuk Colo Pole folder (New Cable kosong)
+    // Jika segmen dari New Cable → masuk New Cable, Colo Pole berisi colo yg di-assign
     return fdr(disp,
       fdr('Route',
-        fdr('New Cable', fixN(seg.xmlStr,disp)),
-        fdr('Colo Pole', pms(assigned.colo[i])),
+        fdr('New Cable', isColo ? '' : fixN(seg.xmlStr,disp)),
+        fdr('Colo Pole', isColo ? fixN(seg.xmlStr,disp) : pms(assigned.colo[i])),
         fdr('Colo Cable'), fdr('UG Cable'), fdr('Colo Pole Rektifikasi'), fdr('New cable Rektifikasi')
       ),
       fdr('Closure', fdr('New Closure',pms(assigned.newClosure[i])), fdr('Existing Closure',pms(assigned.exClosure[i]))),
@@ -1473,10 +1527,14 @@ function showSplitResult(data, assigned) {
   tb.innerHTML = '';
   segs.forEach((seg,i) => {
     const disp = seg.name.replace(/;/g,'<>');
+    const isColo = seg.type === 'colo';
+    const typeBadge = isColo
+      ? '<span class="badge-colo-s" style="background:#ede9fe;color:#7c3aed;border-color:#c4b5fd">Colo</span>'
+      : '<span class="badge-colo-s" style="background:#dbeafe;color:#1e40af;border-color:#93c5fd">NC</span>';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="color:var(--muted);font-size:0.73rem">${i+1}</td>
-      <td><span class="split-seg-name">${disp}</span>${assigned.colo[i].length?'<span class="badge-colo-s">Colo</span>':''}</td>
+      <td><span class="split-seg-name">${disp}</span>${typeBadge}${(!isColo && assigned.colo[i].length)?'<span class="badge-colo-s">+Colo</span>':''}</td>
       <td class="r">${assigned.hanger[i].length}</td>
       <td class="r" style="color:var(--green);font-weight:600">${assigned.pole7[i].length}</td>
       <td class="r" style="color:var(--yellow);font-weight:600">${assigned.pole9[i].length}</td>
