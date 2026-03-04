@@ -223,6 +223,10 @@ table.rt tbody tr.from-kmz:hover { background:#dcfce7 !important; }
 
 .td-in { border:1px solid var(--border); border-radius:6px; padding:0.32rem 0.55rem; width:100%; min-width:72px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; text-align:right; outline:none; transition:border 0.2s; background:white; }
 .td-in:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(30,64,175,0.08); }
+.price-in { border:1px solid #93c5fd; border-radius:6px; padding:0.35rem 0.6rem 0.35rem 2rem; width:100%; min-width:130px; font-family:'JetBrains Mono',monospace; font-size:0.82rem; text-align:right; outline:none; transition:all 0.2s; background:#eff6ff; color:#1e40af; font-weight:700; }
+.price-in:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(30,64,175,0.12); background:white; }
+.price-wrap { position:relative; display:inline-flex; align-items:center; width:100%; }
+.price-prefix { position:absolute; left:0.55rem; font-size:0.68rem; color:#64748b; font-family:'JetBrains Mono',monospace; pointer-events:none; z-index:1; font-weight:600; }
 .td-name { border:1px solid var(--border); border-radius:6px; padding:0.32rem 0.55rem; width:100%; min-width:130px; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.8rem; outline:none; transition:border 0.2s; background:white; }
 .td-name:focus { border-color:var(--accent); }
 .td-calc { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--green); font-weight:700; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:0.32rem 0.55rem; min-width:72px; text-align:right; display:inline-block; width:100%; }
@@ -922,7 +926,14 @@ function parseKml(xml) {
   // Routes — hanya dari direct children folder, bukan nested
   function collectRoutes(folder, type) {
     if (!folder) return;
-    for (const pm of folder.querySelectorAll(':scope > Placemark')) {
+    // Try both direct children and one level deep (some KMZ have Route > subfolder > Placemarks)
+    const placemarks = new Set();
+    for (const pm of folder.querySelectorAll(':scope > Placemark')) placemarks.add(pm);
+    // Also check direct child folders' placemarks
+    for (const sf of folder.querySelectorAll(':scope > Folder')) {
+      for (const pm of sf.querySelectorAll(':scope > Placemark')) placemarks.add(pm);
+    }
+    for (const pm of placemarks) {
       const ls = pm.querySelector('LineString');
       const ce = ls ? ls.querySelector('coordinates') : pm.querySelector('coordinates');
       if (ce) {
@@ -931,17 +942,65 @@ function parseKml(xml) {
       }
     }
   }
-  collectRoutes(findMainFolder('New Cable'), 'new_cable');
-  collectRoutes(findMainFolder('Colo Cable'), 'collo_cable');
-  collectRoutes(findMainFolder('Colo Pole'), 'collo_pole');
+  // Improved: try multiple name variants for each type
+  const ncFolder = findMainFolder('New Cable') || findMainFolder('NewCable') || findMainFolder('new cable') || findMainFolder('NC');
+  const ccFolder = findMainFolder('Colo Cable') || findMainFolder('ColoCable') || findMainFolder('Collo Cable') || findMainFolder('ColloCable') || findMainFolder('collo cable') || findMainFolder('colo cable');
+  const cpFolder = findMainFolder('Colo Pole') || findMainFolder('ColoPole') || findMainFolder('Collo Pole') || findMainFolder('ColloPole') || findMainFolder('collo pole') || findMainFolder('colo pole');
+
+  // Also try searching all folders with flexible matching
+  function findFolderFlex(keywords) {
+    const doc = xml.querySelector('Document') || xml;
+    for (const f of doc.querySelectorAll('Folder')) {
+      const n = kmlName(f).toLowerCase();
+      if (keywords.some(k => n.includes(k.toLowerCase()))) return f;
+    }
+    return null;
+  }
+
+  const ncF = ncFolder || findFolderFlex(['new cable','newcable','kabel baru','nc route']);
+  const ccF = ccFolder || findFolderFlex(['colo cable','collo cable','collocable','colo kabel']);
+  const cpF = cpFolder || findFolderFlex(['colo pole','collo pole','colopole','collopole']);
+
+  collectRoutes(ncF, 'new_cable');
+  collectRoutes(ccF, 'collo_cable');
+  collectRoutes(cpF, 'collo_pole');
+
   if (data.routes.length === 0) {
-    for (const pm of xml.querySelectorAll('Placemark')) {
-      const ls = pm.querySelector('LineString');
-      if (ls) {
-        const ce = ls.querySelector('coordinates');
-        if (ce) {
-          const pts = ce.textContent.trim().split(/\s+/).map(parseCoord).filter(Boolean);
-          if (pts.length > 1) data.routes.push({ name: kmlName(pm)||'Route', points: pts, type: 'unknown' });
+    // Fallback: collect all LineStrings and try to guess type from folder context
+    function collectAllWithType(node, guessedType) {
+      for (const pm of node.querySelectorAll('Placemark')) {
+        const ls = pm.querySelector('LineString');
+        if (ls) {
+          const ce = ls.querySelector('coordinates');
+          if (ce) {
+            const pts = ce.textContent.trim().split(/\s+/).map(parseCoord).filter(Boolean);
+            if (pts.length > 1) data.routes.push({ name: kmlName(pm)||'Route', points: pts, type: guessedType });
+          }
+        }
+      }
+    }
+    // Try to find any folders with route data and guess types
+    const doc = xml.querySelector('Document') || xml;
+    let found = false;
+    for (const f of doc.querySelectorAll('Folder')) {
+      const n = kmlName(f).toLowerCase();
+      let t = 'unknown';
+      if (n.includes('new') && n.includes('cable')) t = 'new_cable';
+      else if ((n.includes('colo') || n.includes('collo')) && n.includes('cable')) t = 'collo_cable';
+      else if ((n.includes('colo') || n.includes('collo')) && n.includes('pole')) t = 'collo_pole';
+      else if (n.includes('route') || n.includes('rute')) t = 'new_cable';
+      collectAllWithType(f, t);
+      found = true;
+    }
+    if (!found) {
+      for (const pm of xml.querySelectorAll('Placemark')) {
+        const ls = pm.querySelector('LineString');
+        if (ls) {
+          const ce = ls.querySelector('coordinates');
+          if (ce) {
+            const pts = ce.textContent.trim().split(/\s+/).map(parseCoord).filter(Boolean);
+            if (pts.length > 1) data.routes.push({ name: kmlName(pm)||'Route', points: pts, type: 'unknown' });
+          }
         }
       }
     }
@@ -1074,10 +1133,12 @@ function renderKmz(data, tol) {
 
       // Update route-type counter cards
       function fmtLen(n){ return n>=1000?(n/1000).toFixed(2)+' km':n.toLocaleString('id-ID')+' m'; }
-      const nc=typeStats.new_cable, cc=typeStats.collo_cable, cp=typeStats.collo_pole;
-      document.getElementById('rtLenNC').textContent=nc.len.toLocaleString('id-ID');
-      document.getElementById('rtSubNC').textContent=fmtLen(nc.len)+' total';
-      document.getElementById('rtSegNC').textContent=nc.seg+' segmen';
+      const nc=typeStats.new_cable, cc=typeStats.collo_cable, cp=typeStats.collo_pole, unk=typeStats.unknown;
+      // If all routes are 'unknown', show them under New Cable as fallback
+      const ncDisplay = { len: nc.len + (cc.len===0&&cp.len===0?unk.len:0), seg: nc.seg + (cc.len===0&&cp.len===0?unk.seg:0) };
+      document.getElementById('rtLenNC').textContent=ncDisplay.len.toLocaleString('id-ID');
+      document.getElementById('rtSubNC').textContent=fmtLen(ncDisplay.len)+' total';
+      document.getElementById('rtSegNC').textContent=ncDisplay.seg+' segmen';
       document.getElementById('rtLenCC').textContent=cc.len.toLocaleString('id-ID');
       document.getElementById('rtSubCC').textContent=fmtLen(cc.len)+' total';
       document.getElementById('rtSegCC').textContent=cc.seg+' segmen';
@@ -1293,8 +1354,19 @@ function recalc(){
     tr.innerHTML=`
       <td class="mc">${idx+1}</td>
       <td><div class="it-desc">${item.label}${badge}<small>${item.sub}</small></div></td>
-      <td class="r"><input class="td-in" type="text" inputmode="numeric" value="${item.price}" style="min-width:100px"
-          oninput="ITEMS[${idx}].price=pn(this.value);recalc()"></td>
+      <td class="r">
+        <div class="price-wrap">
+          <span class="price-prefix">Rp</span>
+          <input class="price-in" type="text" inputmode="numeric"
+            value="${Math.round(item.price).toLocaleString('id-ID')}"
+            style="min-width:130px"
+            onfocus="this.value=pn(this.value.replace(/[^0-9]/g,''))||ITEMS[${idx}].price;this.select()"
+            onblur="ITEMS[${idx}].price=pn(this.value);this.value=Math.round(ITEMS[${idx}].price).toLocaleString('id-ID');recalc()"
+            oninput="ITEMS[${idx}].price=pn(this.value.replace(/[^0-9]/g,''));recalc()"
+            onkeydown="if(event.key==='Enter'){this.blur()}"
+            title="Klik untuk edit harga satuan">
+        </div>
+      </td>
       <td class="r computed">${fmt(ca)}</td>
       <td class="r computed">${fmt(cb)}${ec>0?`<br><span style="font-size:0.67rem;color:var(--muted)">+${ec} lain: ${fmt(es)}</span>`:''}</td>
       <td class="r"><strong>${fmt(tv)}</strong></td>
@@ -1320,7 +1392,17 @@ function recalc(){
   document.getElementById('colB').textContent=routes[1]?.name||'Route 2';
 }
 
-function pn(v){ const n=parseFloat(String(v).replace(/[^0-9.]/g,'')); return isNaN(n)?0:n; }
+function pn(v){ 
+  // Strip Indonesian thousand separators (dots) and handle plain numbers
+  const s=String(v).trim();
+  // Remove Rp prefix and spaces
+  const stripped=s.replace(/[Rp\s]/g,'');
+  // Indonesian format uses dots as thousand sep: 1.500.000
+  // Remove all dots then parse
+  const clean=stripped.replace(/\./g,'').replace(/,/g,'.');
+  const n=parseFloat(clean.replace(/[^0-9.]/g,''));
+  return isNaN(n)?0:n;
+}
 function fmt(n){ return Math.round(n).toLocaleString('id-ID'); }
 function fmtRp(n){ return 'Rp '+Math.round(n).toLocaleString('id-ID'); }
 function fmtS(n){
