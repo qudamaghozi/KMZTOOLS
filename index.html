@@ -1180,11 +1180,20 @@ function importToBoq() {
   // Build new routes array from KMZ
   routes = r.routes.map((rt, i) => {
     const te = (r.tecounts||[])[i]||0;
+    const len = r.lengths[i];
+    const type = rt.type || 'new_cable';
+    // Map KMZ type to correct BOQ field:
+    // new_cable   → newcable (New Cable)
+    // collo_pole  → collo   (Collo ≤24)
+    // collo_cable → collocable (Collo Cable)
+    const newcable   = type === 'new_cable'   ? len : 0;
+    const collo      = type === 'collo_pole'  ? len : 0;
+    const collocable = type === 'collo_cable' ? len : 0;
     return {
       name:       rt.name.replace(/;/g,' – '),
-      newcable:   r.lengths[i],
-      collo:      0,
-      collocable: 0,
+      newcable,
+      collo,
+      collocable,
       hanger:     r.hgcounts[i],
       slack:      0,
       pole7:      r.p7counts[i],
@@ -1194,6 +1203,7 @@ function importToBoq() {
       ringTB9:    0,
       ringTE:     te,       // TE dari KMZ → Collo Pole otomatis
       _fromKmz:   true,
+      _type:      type,     // simpan tipe asli untuk referensi
     };
   });
 
@@ -1203,7 +1213,8 @@ function importToBoq() {
 
   switchTab('boq');
   renderRoutes();
-  recalc();
+  renderBoqRows();
+  updateBoqCalc();
 }
 
 function clearImport() {
@@ -1212,7 +1223,7 @@ function clearImport() {
     { name:'SITE B – SITE C', newcable:0, collo:0, collocable:0, hanger:0, slack:0, pole7:0, pole9:0, isRing:false, ringTB7:0, ringTB9:0, ringTE:0 },
   ];
   document.getElementById('importBadge').style.display='none';
-  renderRoutes(); recalc();
+  renderRoutes(); renderBoqRows(); updateBoqCalc();
 }
 
 // ─── BOQ STATE ───────────────────────────────────────────
@@ -1284,7 +1295,7 @@ function renderRoutes(){
       </td>
       <td class="cs4" style="text-align:center">
         <input type="checkbox" class="ring-chk" title="Aktifkan Ring Logic" ${r.isRing?'checked':''}
-          onchange="routes[${i}].isRing=this.checked;renderRoutes();recalc()">
+          onchange="routes[${i}].isRing=this.checked;renderRoutes();renderBoqRows();updateBoqCalc()">
       </td>
       <td><input class="${dimCls}" type="text" inputmode="numeric" value="${r.ringTB7||0}" placeholder="0"
           oninput="routes[${i}].ringTB7=pn(this.value);uc(${i});recalc()" title="TB7 dilewati 2x"></td>
@@ -1320,37 +1331,28 @@ function uc(i){
 function addRoute(){
   const L='ABCDEFGHIJKLMNOPQRSTUVWXYZ', n=routes.length;
   routes.push({name:`SITE ${L[n]} – SITE ${L[n+1]}`,newcable:0,collo:0,collocable:0,hanger:0,slack:0,pole7:0,pole9:0,isRing:false,ringTB7:0,ringTB9:0,ringTE:0});
-  renderRoutes(); recalc();
+  renderRoutes(); renderBoqRows(); updateBoqCalc();
 }
 function delRoute(i){
   if(routes.length<=1) return alert('Minimal harus ada 1 route.');
-  routes.splice(i,1); renderRoutes(); recalc();
+  routes.splice(i,1); renderRoutes(); renderBoqRows(); updateBoqCalc();
 }
 
-function recalc(){
-  const vp=pn(document.getElementById('vatPct').value)/100||0;
-  document.getElementById('vatLbl').textContent=(vp*100).toFixed(0)+'%';
-  document.getElementById('vatChip').textContent=(vp*100).toFixed(0);
-
-  const keys=['newcable','collo','collocable','pole7','pole9','hanger'];
-  const vpR=routes.map(r=>{
-    const c=computeR(r);
-    const rTB7=r.isRing?r.ringTB7||0:0, rTB9=r.isRing?r.ringTB9||0:0;
-    return {newcable:c.nc, collo:c.co+c.cp, collocable:c.cc, pole7:Math.max(0,r.pole7-rTB7), pole9:Math.max(0,r.pole9-rTB9), hanger:r.hanger};
-  });
-
-  const tb=document.getElementById('boqBody'); tb.innerHTML='';
-  let gSub=0,gVol=0;
+// Build BOQ table rows (only when structure changes: add/delete route, import)
+function renderBoqRows(){
+  const keys=["newcable","collo","collocable","pole7","pole9","hanger"];
+  const vpR=getVpR();
+  const tb=document.getElementById("boqBody"); tb.innerHTML="";
 
   ITEMS.forEach((item,idx)=>{
     const key=keys[idx];
     const vols=vpR.map(v=>v[key]);
     const tv=vols.reduce((a,b)=>a+b,0), ta=tv*item.price;
-    gSub+=ta; gVol+=tv;
     const ca=vols[0]??0,cb=vols[1]??0;
     const ec=vols.slice(2).length, es=vols.slice(2).reduce((a,b)=>a+b,0);
     const badge=item.cable?'<span class="badge-f">+formula</span>':'';
-    const tr=document.createElement('tr');
+    const tr=document.createElement("tr");
+    tr.setAttribute("data-boq-idx",idx);
     tr.innerHTML=`
       <td class="mc">${idx+1}</td>
       <td><div class="it-desc">${item.label}${badge}<small>${item.sub}</small></div></td>
@@ -1358,38 +1360,135 @@ function recalc(){
         <div class="price-wrap">
           <span class="price-prefix">Rp</span>
           <input class="price-in" type="text" inputmode="numeric"
-            value="${Math.round(item.price).toLocaleString('id-ID')}"
+            data-price-idx="${idx}"
+            value="${Math.round(item.price).toLocaleString("id-ID")}"
             style="min-width:130px"
-            onfocus="this.value=pn(this.value.replace(/[^0-9]/g,''))||ITEMS[${idx}].price;this.select()"
-            onblur="ITEMS[${idx}].price=pn(this.value);this.value=Math.round(ITEMS[${idx}].price).toLocaleString('id-ID');recalc()"
-            oninput="ITEMS[${idx}].price=pn(this.value.replace(/[^0-9]/g,''));recalc()"
-            onkeydown="if(event.key==='Enter'){this.blur()}"
             title="Klik untuk edit harga satuan">
         </div>
       </td>
-      <td class="r computed">${fmt(ca)}</td>
-      <td class="r computed">${fmt(cb)}${ec>0?`<br><span style="font-size:0.67rem;color:var(--muted)">+${ec} lain: ${fmt(es)}</span>`:''}</td>
-      <td class="r"><strong>${fmt(tv)}</strong></td>
-      <td class="r computed-t">${fmtRp(ta)}</td>`;
+      <td class="r computed" id="boq-ca-${idx}">${fmt(ca)}</td>
+      <td class="r computed" id="boq-cb-${idx}">${fmt(cb)}${ec>0?`<br><span style="font-size:0.67rem;color:var(--muted)">+${ec} lain: ${fmt(es)}</span>`:""}</td>
+      <td class="r" id="boq-tv-${idx}"><strong>${fmt(tv)}</strong></td>
+      <td class="r computed-t" id="boq-ta-${idx}">${fmtRp(ta)}</td>`;
     tb.appendChild(tr);
   });
 
+  // Attach price input listeners ONCE — no recalc on oninput, only updateBoqCalc
+  document.querySelectorAll(".price-in[data-price-idx]").forEach(inp=>{
+    const idx=parseInt(inp.getAttribute("data-price-idx"));
+    inp.addEventListener("focus",function(){
+      // Show raw number for easy editing
+      this.value=String(Math.round(ITEMS[idx].price));
+      this.select();
+    });
+    inp.addEventListener("input",function(){
+      const raw=this.value.replace(/[^0-9]/g,"");
+      ITEMS[idx].price=raw===""?0:parseInt(raw,10);
+      updateBoqCalc(); // update numbers WITHOUT rebuilding DOM
+    });
+    inp.addEventListener("blur",function(){
+      // Reformat with thousand separator on blur
+      this.value=Math.round(ITEMS[idx].price).toLocaleString("id-ID");
+      updateBoqCalc();
+    });
+    inp.addEventListener("keydown",function(e){
+      if(e.key==="Enter") this.blur();
+    });
+  });
+
+  // Append footer rows
+  appendBoqFooter(tb);
+}
+
+function getVpR(){
+  const vp=pn(document.getElementById("vatPct").value)/100||0;
+  return routes.map(r=>{
+    const c=computeR(r);
+    const rTB7=r.isRing?r.ringTB7||0:0, rTB9=r.isRing?r.ringTB9||0:0;
+    return {newcable:c.nc, collo:c.co+c.cp, collocable:c.cc, pole7:Math.max(0,r.pole7-rTB7), pole9:Math.max(0,r.pole9-rTB9), hanger:r.hanger};
+  });
+}
+
+function appendBoqFooter(tb){
+  // Remove old footer rows if any
+  tb.querySelectorAll(".row-sub,.row-vat,.row-tot").forEach(r=>r.remove());
+  const vp=pn(document.getElementById("vatPct").value)/100||0;
+  const vpR=getVpR();
+  const keys=["newcable","collo","collocable","pole7","pole9","hanger"];
+  let gSub=0,gVol=0;
+  ITEMS.forEach((item,idx)=>{
+    const vols=vpR.map(v=>v[keys[idx]]);
+    const tv=vols.reduce((a,b)=>a+b,0);
+    gSub+=tv*item.price; gVol+=tv;
+  });
   const vat=gSub*vp, tot=gSub+vat;
   const mkRow=(cls,lbl,vol,amt)=>{
-    const tr=document.createElement('tr'); tr.className=cls;
+    const tr=document.createElement("tr"); tr.className=cls;
     tr.innerHTML=`<td colspan="5" style="text-align:right;font-size:0.8rem">${lbl}</td><td class="r">${vol}</td><td class="r">${amt}</td>`;
     tb.appendChild(tr);
   };
-  mkRow('row-sub','SUBTOTAL',fmt(gVol),fmtRp(gSub));
-  mkRow('row-vat',`VAT ${(vp*100).toFixed(0)}%`,'—',fmtRp(vat));
-  mkRow('row-tot','TOTAL AKHIR','—',fmtRp(tot));
+  mkRow("row-sub","SUBTOTAL",fmt(gVol),fmtRp(gSub));
+  mkRow("row-vat",`VAT ${(vp*100).toFixed(0)}%`,"—",fmtRp(vat));
+  mkRow("row-tot","TOTAL AKHIR","—",fmtRp(tot));
+  return {gSub,gVol,vat,tot,vp};
+}
 
-  document.getElementById('sumSub').textContent=fmtS(gSub);   document.getElementById('sumSubF').textContent=fmtRp(gSub);
-  document.getElementById('sumVat').textContent=fmtS(vat);    document.getElementById('sumVatF').textContent=fmtRp(vat);
-  document.getElementById('sumTot').textContent=fmtS(tot);    document.getElementById('sumTotF').textContent=fmtRp(tot);
-  document.getElementById('sumVol').textContent=fmt(gVol);
-  document.getElementById('colA').textContent=routes[0]?.name||'Route 1';
-  document.getElementById('colB').textContent=routes[1]?.name||'Route 2';
+// Update only the calculated cells — does NOT rebuild DOM, safe during typing
+function updateBoqCalc(){
+  const vp=pn(document.getElementById("vatPct").value)/100||0;
+  document.getElementById("vatLbl").textContent=(vp*100).toFixed(0)+"%";
+  document.getElementById("vatChip").textContent=(vp*100).toFixed(0);
+
+  const keys=["newcable","collo","collocable","pole7","pole9","hanger"];
+  const vpR=getVpR();
+  let gSub=0,gVol=0;
+
+  ITEMS.forEach((item,idx)=>{
+    const vols=vpR.map(v=>v[keys[idx]]);
+    const tv=vols.reduce((a,b)=>a+b,0), ta=tv*item.price;
+    gSub+=ta; gVol+=tv;
+    const ca=vols[0]??0,cb=vols[1]??0;
+    const ec=vols.slice(2).length, es=vols.slice(2).reduce((a,b)=>a+b,0);
+    const elCa=document.getElementById(`boq-ca-${idx}`);
+    const elCb=document.getElementById(`boq-cb-${idx}`);
+    const elTv=document.getElementById(`boq-tv-${idx}`);
+    const elTa=document.getElementById(`boq-ta-${idx}`);
+    if(elCa) elCa.textContent=fmt(ca);
+    if(elCb) elCb.innerHTML=fmt(cb)+(ec>0?`<br><span style="font-size:0.67rem;color:var(--muted)">+${ec} lain: ${fmt(es)}</span>`:"");
+    if(elTv) elTv.innerHTML=`<strong>${fmt(tv)}</strong>`;
+    if(elTa) elTa.textContent=fmtRp(ta);
+  });
+
+  const vat=gSub*vp, tot=gSub+vat;
+  // Update footer rows in-place
+  const tb=document.getElementById("boqBody");
+  const subRow=tb.querySelector(".row-sub");
+  const vatRow=tb.querySelector(".row-vat");
+  const totRow=tb.querySelector(".row-tot");
+  if(subRow){ subRow.cells[1].textContent=fmt(gVol); subRow.cells[2].textContent=fmtRp(gSub); }
+  if(vatRow){ vatRow.cells[0].textContent=`VAT ${(vp*100).toFixed(0)}%`; vatRow.cells[2].textContent=fmtRp(vat); }
+  if(totRow){ totRow.cells[2].textContent=fmtRp(tot); }
+
+  document.getElementById("sumSub").textContent=fmtS(gSub);   document.getElementById("sumSubF").textContent=fmtRp(gSub);
+  document.getElementById("sumVat").textContent=fmtS(vat);    document.getElementById("sumVatF").textContent=fmtRp(vat);
+  document.getElementById("sumTot").textContent=fmtS(tot);    document.getElementById("sumTotF").textContent=fmtRp(tot);
+  document.getElementById("sumVol").textContent=fmt(gVol);
+  document.getElementById("colA").textContent=routes[0]?.name||"Route 1";
+  document.getElementById("colB").textContent=routes[1]?.name||"Route 2";
+}
+
+// recalc: rebuild rows (called when route structure changes) then update calc
+function recalc(){
+  // Check if BOQ rows already exist and only route values changed (not structure)
+  const existingRows=document.querySelectorAll("#boqBody tr[data-boq-idx]");
+  if(existingRows.length===ITEMS.length){
+    // Structure intact — just update numbers, don't touch price inputs
+    updateBoqCalc();
+  } else {
+    // Structure changed — full rebuild
+    renderBoqRows();
+    updateBoqCalc();
+  }
 }
 
 function pn(v){ 
@@ -1445,7 +1544,8 @@ function exportCSV(){
 }
 
 renderRoutes();
-recalc();
+renderBoqRows();
+updateBoqCalc();
 
 // ═══════════════════════════════════════════════════════
 // KMZ PLACER
