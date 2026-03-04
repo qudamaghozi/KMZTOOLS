@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FO Tools — KMZ Counter & BOQ Calculator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -374,7 +375,8 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
     </div>
     <div class="topbar-actions" id="boqActions" style="display:none">
       <div style="width:1px;height:28px;background:rgba(255,255,255,0.15);margin:0 0.3rem"></div>
-      <button class="btn-csv" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn-csv" style="background:#15803d" onclick="exportKabelCSV()" title="Download panjang akhir kabel & hanger per rute">⬇ Data Kabel</button>
+      <button class="btn-csv" onclick="exportCSV()">⬇ CSV BOQ</button>
     </div>
   </div>
 </div>
@@ -689,6 +691,23 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
         <tbody id="boqBody"></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- DOWNLOAD DATA KABEL -->
+  <div class="bq-sec">Download Data Kabel per Rute</div>
+  <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.5rem;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <div style="font-size:0.88rem;font-weight:700;margin-bottom:0.3rem">📐 Panjang Akhir Kabel & Hanger per Rute</div>
+      <div style="font-size:0.77rem;color:var(--muted);line-height:1.6">
+        Mengunduh tabel berisi: <strong>Nama Route</strong> · <strong>New Cable Akhir (m)</strong> · <strong>Collo ≤24 Akhir (m)</strong> · <strong>Collo Cable Akhir (m)</strong> · <strong>Hanger (unit)</strong><br>
+        Nilai sudah dihitung dengan formula: <span style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#1e40af">(Panjang × 1.1) + (Hanger × 20)</span>
+      </div>
+    </div>
+    <button onclick="exportKabelCSV()" style="background:linear-gradient(135deg,#15803d,#16a34a);color:white;border:none;padding:0.6rem 1.4rem;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(21,128,61,0.3);transition:all 0.2s"
+      onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(21,128,61,0.4)'"
+      onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(21,128,61,0.3)'">
+      ⬇ Download Data Kabel (.xlsx)
+    </button>
   </div>
 
 </main>
@@ -1541,6 +1560,162 @@ function exportCSV(){
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`BOQ_${name.replace(/\s+/g,'_')}.csv`; a.click();
+}
+
+function exportKabelCSV(){
+  const name = document.getElementById('projName').value;
+  const rows = routes.map(r => {
+    const c = computeR(r);
+    const rTB7 = r.isRing ? r.ringTB7||0 : 0;
+    const rTB9 = r.isRing ? r.ringTB9||0 : 0;
+    return {
+      nama:    r.name,
+      nc:      c.nc,
+      coTotal: c.co + c.cp,
+      cc:      c.cc,
+      tb7:     r.pole7,
+      tb9:     r.pole9,
+      hanger:  r.hanger,
+    };
+  });
+
+  const hasNC  = rows.some(r => r.nc > 0);
+  const hasCo  = rows.some(r => r.coTotal > 0);
+  const hasCC  = rows.some(r => r.cc > 0);
+  const hasTB7 = rows.some(r => r.tb7 > 0);
+  const hasTB9 = rows.some(r => r.tb9 > 0);
+
+  const wb = XLSX.utils.book_new();
+
+  // ── Build worksheet data (array of arrays) ──
+  const ws_data = [];
+
+  // Title rows
+  ws_data.push(['Data Panjang Akhir Kabel, Tiang & Hanger']);
+  ws_data.push(['Pekerjaan', name]);
+  ws_data.push([]);  // blank row
+
+  // Header
+  const header = ['No', 'Nama Route'];
+  if (hasNC)  header.push('New Cable Akhir (m)');
+  if (hasCo)  header.push('Collo ≤24 Akhir (m)');
+  if (hasCC)  header.push('Collo Cable Akhir (m)');
+  if (hasTB7) header.push('Tiang Baru 7m (unit)');
+  if (hasTB9) header.push('Tiang Baru 9m (unit)');
+  header.push('Hanger (unit)');
+  ws_data.push(header);
+  const headerRowIdx = ws_data.length; // 1-based row index in sheet
+
+  // Data rows
+  rows.forEach((r, i) => {
+    const row = [i + 1, r.nama];
+    if (hasNC)  row.push(r.nc);
+    if (hasCo)  row.push(r.coTotal);
+    if (hasCC)  row.push(r.cc);
+    if (hasTB7) row.push(r.tb7);
+    if (hasTB9) row.push(r.tb9);
+    row.push(r.hanger);
+    ws_data.push(row);
+  });
+
+  // Total row
+  const totNC  = rows.reduce((s, r) => s + r.nc, 0);
+  const totCo  = rows.reduce((s, r) => s + r.coTotal, 0);
+  const totCC  = rows.reduce((s, r) => s + r.cc, 0);
+  const totTB7 = rows.reduce((s, r) => s + r.tb7, 0);
+  const totTB9 = rows.reduce((s, r) => s + r.tb9, 0);
+  const totHg  = rows.reduce((s, r) => s + r.hanger, 0);
+  const totRow = ['', 'TOTAL'];
+  if (hasNC)  totRow.push(totNC);
+  if (hasCo)  totRow.push(totCo);
+  if (hasCC)  totRow.push(totCC);
+  if (hasTB7) totRow.push(totTB7);
+  if (hasTB9) totRow.push(totTB9);
+  totRow.push(totHg);
+  ws_data.push(totRow);
+
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+  // ── Column widths ──
+  const numCols = header.length;
+  ws['!cols'] = [
+    { wch: 5 },   // No
+    { wch: 36 },  // Nama Route
+    ...Array(numCols - 2).fill({ wch: 22 }),
+  ];
+
+  // ── Styling helpers (only works with xlsx-style / full.min supports cell styles) ──
+  const totalRows = ws_data.length;
+  const range = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: totalRows - 1, c: numCols - 1 } });
+  ws['!ref'] = range;
+
+  // Apply bold + fill to header row
+  const hdrR = headerRowIdx - 1; // 0-based
+  for (let c = 0; c < numCols; c++) {
+    const cellAddr = XLSX.utils.encode_cell({ r: hdrR, c });
+    if (!ws[cellAddr]) ws[cellAddr] = { v: header[c], t: 's' };
+    ws[cellAddr].s = {
+      font: { bold: true, color: { rgb: 'FFFFFF' } },
+      fill: { fgColor: { rgb: '1E3A5F' } },
+      alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+      border: {
+        top:    { style: 'thin', color: { rgb: 'AAAAAA' } },
+        bottom: { style: 'thin', color: { rgb: 'AAAAAA' } },
+        left:   { style: 'thin', color: { rgb: 'AAAAAA' } },
+        right:  { style: 'thin', color: { rgb: 'AAAAAA' } },
+      }
+    };
+  }
+
+  // Style data rows
+  const dataStartR = hdrR + 1;
+  const dataEndR   = totalRows - 2; // exclude total row
+  for (let r = dataStartR; r <= dataEndR; r++) {
+    const isEven = (r - dataStartR) % 2 === 1;
+    for (let c = 0; c < numCols; c++) {
+      const cellAddr = XLSX.utils.encode_cell({ r, c });
+      if (!ws[cellAddr]) ws[cellAddr] = { v: '', t: 's' };
+      ws[cellAddr].s = {
+        fill: { fgColor: { rgb: isEven ? 'F0F7FF' : 'FFFFFF' } },
+        alignment: { horizontal: c <= 1 ? 'left' : 'right', vertical: 'center' },
+        border: {
+          top:    { style: 'thin', color: { rgb: 'E2E8F0' } },
+          bottom: { style: 'thin', color: { rgb: 'E2E8F0' } },
+          left:   { style: 'thin', color: { rgb: 'E2E8F0' } },
+          right:  { style: 'thin', color: { rgb: 'E2E8F0' } },
+        }
+      };
+    }
+  }
+
+  // Style TOTAL row
+  const totR = totalRows - 1;
+  for (let c = 0; c < numCols; c++) {
+    const cellAddr = XLSX.utils.encode_cell({ r: totR, c });
+    if (!ws[cellAddr]) ws[cellAddr] = { v: '', t: 's' };
+    ws[cellAddr].s = {
+      font: { bold: true, color: { rgb: '15803D' } },
+      fill: { fgColor: { rgb: 'F0FDF4' } },
+      alignment: { horizontal: c <= 1 ? 'left' : 'right', vertical: 'center' },
+      border: {
+        top:    { style: 'medium', color: { rgb: '86EFAC' } },
+        bottom: { style: 'thin',   color: { rgb: '86EFAC' } },
+        left:   { style: 'thin',   color: { rgb: 'E2E8F0' } },
+        right:  { style: 'thin',   color: { rgb: 'E2E8F0' } },
+      }
+    };
+  }
+
+  // Style title rows
+  const titleCell = XLSX.utils.encode_cell({ r: 0, c: 0 });
+  if (ws[titleCell]) ws[titleCell].s = { font: { bold: true, sz: 14, color: { rgb: '1E3A5F' } } };
+  const projCell = XLSX.utils.encode_cell({ r: 1, c: 1 });
+  if (ws[projCell]) ws[projCell].s = { font: { bold: true, color: { rgb: '1E40AF' } } };
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Data Kabel');
+
+  // ── Write and download ──
+  XLSX.writeFile(wb, `DataKabel_${name.replace(/\s+/g, '_')}.xlsx`);
 }
 
 renderRoutes();
