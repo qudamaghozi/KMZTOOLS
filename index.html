@@ -272,9 +272,9 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
 .split-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:0.8rem; margin-bottom:1.2rem; }
 .split-stat { background:white; border:1px solid var(--border); border-radius:10px; padding:0.8rem 1rem; box-shadow:var(--shadow); position:relative; overflow:hidden; }
 .split-stat::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
-.split-stat.ss1::before { background:var(--accent); } .split-stat.ss2::before { background:var(--green); } .split-stat.ss3::before { background:var(--yellow); } .split-stat.ss4::before { background:#7c3aed; } .split-stat.ss5::before { background:#c2410c; }
+.split-stat.ss1::before { background:var(--accent); } .split-stat.ss2::before { background:var(--green); } .split-stat.ss3::before { background:var(--yellow); } .split-stat.ss4::before { background:#7c3aed; } .split-stat.ss5::before { background:#c2410c; } .split-stat.ss6::before { background:#0891b2; } .split-stat.ss7::before { background:#b45309; }
 .split-snum { font-size:1.5rem; font-weight:800; font-family:'JetBrains Mono',monospace; line-height:1; margin-bottom:0.2rem; }
-.split-stat.ss1 .split-snum { color:var(--accent); } .split-stat.ss2 .split-snum { color:var(--green); } .split-stat.ss3 .split-snum { color:var(--yellow); } .split-stat.ss4 .split-snum { color:#7c3aed; } .split-stat.ss5 .split-snum { color:#c2410c; }
+.split-stat.ss1 .split-snum { color:var(--accent); } .split-stat.ss2 .split-snum { color:var(--green); } .split-stat.ss3 .split-snum { color:var(--yellow); } .split-stat.ss4 .split-snum { color:#7c3aed; } .split-stat.ss5 .split-snum { color:#c2410c; } .split-stat.ss6 .split-snum { color:#0891b2; } .split-stat.ss7 .split-snum { color:#b45309; }
 .split-slbl { font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; }
 .split-seg-table-wrap { background:white; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:1.2rem; box-shadow:var(--shadow); overflow-x:auto; }
 .split-seg-table-wrap table { width:100%; border-collapse:collapse; font-size:0.8rem; }
@@ -526,6 +526,8 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
         <div class="split-stat ss1"><div class="split-snum" id="sstSeg">-</div><div class="split-slbl">Segmen</div></div>
         <div class="split-stat ss2"><div class="split-snum" id="sstP7">-</div><div class="split-slbl">Pole 7m</div></div>
         <div class="split-stat ss3"><div class="split-snum" id="sstP9">-</div><div class="split-slbl">Pole 9m</div></div>
+        <div class="split-stat ss6"><div class="split-snum" id="sstNewPole">-</div><div class="split-slbl">Total New Pole</div></div>
+        <div class="split-stat ss7"><div class="split-snum" id="sstExPole">-</div><div class="split-slbl">Total Existing Pole</div></div>
         <div class="split-stat ss4"><div class="split-snum" id="sstHg">-</div><div class="split-slbl">Hanger</div></div>
         <div class="split-stat ss5"><div class="split-snum" id="sstOdp">-</div><div class="split-slbl">ODP</div></div>
       </div>
@@ -1918,6 +1920,10 @@ function showSplitResult(data, assigned) {
   document.getElementById('sstSeg').textContent = segs.length;
   document.getElementById('sstP7').textContent  = assigned.pole7.reduce((a,b)=>a+b.length,0);
   document.getElementById('sstP9').textContent  = assigned.pole9.reduce((a,b)=>a+b.length,0);
+  const totalNew = ['pole7','pole9','sisip7','sisip9','rep7','rep9'].reduce((s,k)=>s+assigned[k].reduce((a,b)=>a+b.length,0),0);
+  const totalEx  = assigned.exPole.reduce((a,b)=>a+b.length,0);
+  document.getElementById('sstNewPole').textContent = totalNew;
+  document.getElementById('sstExPole').textContent  = totalEx;
   document.getElementById('sstHg').textContent  = assigned.hanger.reduce((a,b)=>a+b.length,0);
   document.getElementById('sstOdp').textContent = assigned.odp.reduce((a,b)=>a+b.length,0);
 
