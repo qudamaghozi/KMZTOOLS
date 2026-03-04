@@ -294,6 +294,60 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
 .split-err-box { background:var(--red-light); border:1px solid #fca5a5; border-radius:10px; padding:0.9rem 1.3rem; color:var(--red); font-size:0.85rem; margin-bottom:1.2rem; display:none; }
 @media(max-width:600px){ .split-wrap { padding:1.5rem 0.8rem; } .split-stats { grid-template-columns:1fr 1fr; } }
 
+/* ============ KMZ PLACER PAGE ============ */
+.placer-wrap { max-width:960px; margin:0 auto; padding:2rem 1.5rem; display:flex; flex-direction:column; gap:1.4rem; }
+.placer-config { background:white; border:1px solid var(--border); border-radius:14px; padding:1.3rem 1.5rem; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:1rem; }
+.placer-config h3 { font-size:0.85rem; font-weight:700; color:var(--text); }
+.cfg-row { display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap; }
+.cfg-label { font-size:0.82rem; color:var(--muted); white-space:nowrap; min-width:160px; padding-top:0.42rem; }
+.cfg-input { border:1px solid var(--border2); border-radius:7px; padding:0.42rem 0.7rem; font-family:'JetBrains Mono',monospace; font-size:0.88rem; font-weight:600; outline:none; width:110px; text-align:right; transition:border 0.2s; }
+.cfg-input:focus { border-color:var(--accent); }
+.cfg-select { border:1px solid var(--border2); border-radius:7px; padding:0.42rem 0.7rem; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.85rem; outline:none; background:white; min-width:220px; transition:border 0.2s; cursor:pointer; }
+.cfg-select:focus { border-color:var(--accent); }
+
+/* Multi-select route picker */
+.route-picker { position:relative; min-width:260px; }
+.route-picker-btn { border:1px solid var(--border2); border-radius:7px; padding:0.42rem 0.75rem; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.85rem; background:white; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; transition:border 0.2s; user-select:none; min-width:260px; }
+.route-picker-btn:hover,.route-picker-btn.open { border-color:var(--accent); }
+.route-picker-badge { background:var(--accent); color:white; border-radius:20px; font-size:0.68rem; font-weight:700; padding:0.1rem 0.45rem; min-width:18px; text-align:center; }
+.route-picker-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; min-width:300px; background:white; border:1px solid var(--border2); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:200; overflow:hidden; }
+.route-picker-actions { display:flex; gap:0; border-bottom:1px solid var(--border); }
+.route-picker-actions button { flex:1; background:none; border:none; padding:0.45rem 0.5rem; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.75rem; font-weight:600; cursor:pointer; color:var(--accent); transition:background 0.15s; }
+.route-picker-actions button:hover { background:#eff6ff; }
+.route-picker-actions button:first-child { border-right:1px solid var(--border); }
+.route-picker-list { max-height:220px; overflow-y:auto; }
+.route-picker-item { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.9rem; cursor:pointer; transition:background 0.12s; font-size:0.83rem; border-bottom:1px solid var(--border); }
+.route-picker-item:last-child { border-bottom:none; }
+.route-picker-item:hover { background:#eff6ff; }
+.route-picker-item input[type=checkbox] { accent-color:var(--accent); width:14px; height:14px; flex-shrink:0; cursor:pointer; }
+.route-picker-item label { cursor:pointer; flex:1; line-height:1.3; }
+.cfg-hint { font-size:0.73rem; color:var(--muted); padding-top:0.5rem; }
+.cfg-radio-group { display:flex; gap:0.7rem; flex-wrap:wrap; }
+.cfg-radio-opt { display:flex; align-items:center; gap:0.4rem; background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:0.38rem 0.8rem; cursor:pointer; font-size:0.82rem; transition:all 0.15s; }
+.cfg-radio-opt:has(input:checked) { background:#eff6ff; border-color:var(--accent); color:var(--accent); font-weight:600; }
+.cfg-radio-opt input { accent-color:var(--accent); }
+.cfg-name-box { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:0.65rem 1rem; display:flex; flex-direction:column; gap:0.4rem; }
+.cfg-name-box label { font-size:0.73rem; color:var(--muted); }
+.cfg-name-box input[type=text] { border:1px solid var(--border2); border-radius:6px; padding:0.38rem 0.65rem; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.85rem; outline:none; min-width:200px; transition:border 0.2s; background:white; }
+.cfg-name-box input[type=text]:focus { border-color:var(--accent); }
+.btn-generate { background:var(--accent); color:white; border:none; padding:0.55rem 1.4rem; border-radius:8px; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.2s; }
+.btn-generate:hover { background:#1d4ed8; }
+.btn-dl-kmz { background:var(--green); color:white; border:none; padding:0.5rem 1.2rem; border-radius:8px; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.82rem; cursor:pointer; transition:all 0.2s; }
+.btn-dl-kmz:hover { background:#166534; }
+.placer-result { background:white; border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); }
+.placer-result-hd { background:var(--table-head); padding:0.85rem 1.3rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem; }
+.placer-result-hd span { color:white; font-size:0.85rem; font-weight:700; }
+.placer-tbl { width:100%; border-collapse:collapse; font-size:0.82rem; }
+.placer-tbl thead tr { background:var(--table-head); }
+.placer-tbl th { padding:0.65rem 1rem; color:#94a3b8; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; font-weight:600; text-align:left; }
+.placer-tbl th.r { text-align:right; }
+.placer-tbl tbody tr { border-bottom:1px solid var(--border); }
+.placer-tbl tbody tr:hover { background:#eff6ff; }
+.placer-tbl td { padding:0.55rem 1rem; }
+.placer-tbl td.r { text-align:right; font-family:'JetBrains Mono',monospace; }
+.placer-tbl td.mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--muted); }
+.name-input-pm { border:1px solid var(--border); border-radius:5px; padding:0.2rem 0.45rem; font-family:'Plus Jakarta Sans',sans-serif; font-size:0.78rem; outline:none; width:100%; min-width:110px; }
+.name-input-pm:focus { border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -312,6 +366,7 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
       <button class="tab-btn active" id="tab-kmz" onclick="switchTab('kmz')">🗺️ KMZ Counter</button>
       <button class="tab-btn" id="tab-split" onclick="switchTab('split')">✂️ KMZ Splitter</button>
       <button class="tab-btn" id="tab-boq" onclick="switchTab('boq')">📋 BOQ Calculator</button>
+      <button class="tab-btn" id="tab-placer" onclick="switchTab('placer')">📍 KMZ Placer</button>
     </div>
     <div class="topbar-actions" id="boqActions" style="display:none">
       <div style="width:1px;height:28px;background:rgba(255,255,255,0.15);margin:0 0.3rem"></div>
@@ -635,6 +690,120 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
 
 
 <!-- ======================================================= -->
+<!-- PAGE: KMZ PLACER                                        -->
+<!-- ======================================================= -->
+<div class="page" id="page-placer">
+<div class="placer-wrap">
+
+  <div class="upload-card" id="placerDrop">
+    <input type="file" id="placerFileInput" accept=".kmz,.kml">
+    <div class="upload-icon">📍</div>
+    <p><strong>Drop file .KMZ atau .KML di sini</strong><br>
+    atau klik untuk memilih — route (LineString) dideteksi otomatis</p>
+  </div>
+
+  <div id="placerApp" style="display:none">
+    <div class="kmz-bar">
+      <div class="file-badge">
+        <span>📦</span>
+        <span class="fn" id="placerFileName">-</span>
+        <span class="fs" id="placerFileSize">-</span>
+      </div>
+      <button class="btn-reset" onclick="resetPlacer()">↩ Ganti File</button>
+    </div>
+
+    <div class="placer-config">
+      <h3>⚙ Konfigurasi Generate Placemark</h3>
+
+      <div class="cfg-row">
+        <span class="cfg-label">Pilih Route</span>
+        <div class="route-picker" id="routePicker">
+          <div class="route-picker-btn" id="routePickerBtn" onclick="toggleRoutePicker()">
+            <span id="routePickerLabel">Semua Route dipilih</span>
+            <span class="route-picker-badge" id="routePickerBadge">0</span>
+          </div>
+          <div class="route-picker-dropdown" id="routePickerDropdown" style="display:none">
+            <div class="route-picker-actions">
+              <button onclick="selectAllRoutes()">✓ Pilih Semua</button>
+              <button onclick="clearAllRoutes()">✕ Hapus Semua</button>
+            </div>
+            <div class="route-picker-list" id="routePickerList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <span class="cfg-label">Interval Jarak</span>
+        <input class="cfg-input" id="placerInterval" type="text" inputmode="numeric" value="300">
+        <span class="cfg-hint">meter — placemark dibuat setiap jarak ini</span>
+      </div>
+
+      <div class="cfg-row">
+        <span class="cfg-label">Mode Penamaan</span>
+        <div style="display:flex;flex-direction:column;gap:0.6rem">
+          <div class="cfg-radio-group">
+            <label class="cfg-radio-opt">
+              <input type="radio" name="pmNameMode" value="prefix" checked onchange="updateNameUI()">
+              Prefix + Nomor urut
+            </label>
+            <label class="cfg-radio-opt">
+              <input type="radio" name="pmNameMode" value="same" onchange="updateNameUI()">
+              Nama sama untuk semua
+            </label>
+          </div>
+          <div class="cfg-name-box" id="nameBoxPrefix">
+            <label>Prefix — hasil: <span id="prefixPreview" style="color:var(--accent);font-weight:700">PM-001, PM-002, ...</span></label>
+            <input type="text" id="placerPrefix" value="PM" oninput="updatePrefixPreview()">
+          </div>
+          <div class="cfg-name-box" id="nameBoxSame" style="display:none">
+            <label>Nama — semua placemark akan punya nama yang sama</label>
+            <input type="text" id="placerSameName" value="Tiang Baru">
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <span class="cfg-label">Titik awal &amp; akhir</span>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;padding-top:0.35rem">
+          <input type="checkbox" id="placerEndpoints" checked style="accent-color:var(--accent);width:15px;height:15px">
+          Sertakan titik awal dan akhir route
+        </label>
+      </div>
+
+      <div class="cfg-row">
+        <span class="cfg-label"></span>
+        <button class="btn-generate" onclick="generatePlacemarks()">⚡ Generate Placemark</button>
+      </div>
+    </div>
+
+    <div class="placer-result" id="placerResult" style="display:none">
+      <div class="placer-result-hd">
+        <span id="placerResultTitle">Hasil</span>
+        <button class="btn-dl-kmz" onclick="downloadPlacerKmz()">⬇ Download KMZ</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="placer-tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>Route</th>
+              <th class="r">Jarak dari awal (m)</th>
+              <th class="r">Longitude</th>
+              <th class="r">Latitude</th>
+            </tr>
+          </thead>
+          <tbody id="placerTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ======================================================= -->
 <!-- SCRIPTS                                                 -->
 <!-- ======================================================= -->
 <script>
@@ -795,20 +964,22 @@ function parseKml(xml) {
 
 // ─── SPATIAL ────────────────────────────────────────────
 const D2M = 111320;
-function segDist(px,py,ax,ay,bx,by) {
-  const dx=bx-ax, dy=by-ay;
-  if (!dx&&!dy) return Math.hypot(px-ax,py-ay);
-  let t=((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy);
+function segDistM(px,py,ax,ay,bx,by){
+  const cosLat=Math.cos(((py+ay+by)/3)*Math.PI/180);
+  const pxm=px*cosLat*D2M,pym=py*D2M,axm=ax*cosLat*D2M,aym=ay*D2M,bxm=bx*cosLat*D2M,bym=by*D2M;
+  const dx=bxm-axm,dy=bym-aym;
+  if(!dx&&!dy) return Math.hypot(pxm-axm,pym-aym);
+  let t=((pxm-axm)*dx+(pym-aym)*dy)/(dx*dx+dy*dy);
   t=Math.max(0,Math.min(1,t));
-  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+  return Math.hypot(pxm-(axm+t*dx),pym-(aym+t*dy));
 }
-function polyDist(pt,poly) {
+function polyDist(pt,poly){
   let min=Infinity;
-  for (let i=0;i<poly.length-1;i++) {
-    const d=segDist(pt[0],pt[1],poly[i][0],poly[i][1],poly[i+1][0],poly[i+1][1]);
+  for(let i=0;i<poly.length-1;i++){
+    const d=segDistM(pt[0],pt[1],poly[i][0],poly[i][1],poly[i+1][0],poly[i+1][1]);
     if(d<min) min=d;
   }
-  return min*D2M;
+  return min;
 }
 function polyLen(pts) {
   // Haversine-lite: length in meters
@@ -1191,6 +1362,233 @@ function exportCSV(){
 
 renderRoutes();
 recalc();
+
+// ═══════════════════════════════════════════════════════
+// KMZ PLACER
+// ═══════════════════════════════════════════════════════
+(function(){
+  let placerRoutes = [];
+  let generatedPMs = [];
+
+  const placerDrop  = document.getElementById('placerDrop');
+  const placerInput = document.getElementById('placerFileInput');
+  placerDrop.addEventListener('dragover',  e=>{e.preventDefault();placerDrop.classList.add('drag');});
+  placerDrop.addEventListener('dragleave', ()=>placerDrop.classList.remove('drag'));
+  placerDrop.addEventListener('drop',      e=>{e.preventDefault();placerDrop.classList.remove('drag');loadPlacerFile(e.dataTransfer.files[0]);});
+  placerInput.addEventListener('change',   e=>loadPlacerFile(e.target.files[0]));
+
+  async function loadPlacerFile(file) {
+    if (!file) return;
+    try {
+      let kmlText;
+      if (file.name.toLowerCase().endsWith('.kmz')) {
+        const zip = await JSZip.loadAsync(file);
+        const kf  = Object.values(zip.files).find(f=>f.name.endsWith('.kml'));
+        if (!kf) throw new Error('Tidak ada KML di dalam KMZ.');
+        kmlText = await kf.async('string');
+      } else {
+        kmlText = await file.text();
+      }
+      kmlText = kmlText.replace(/<(\w+:)/g,'<').replace(/<\/(\w+:)/g,'</')
+                       .replace(/\s+xmlns(?::\w+)?="[^"]*"/g,'')
+                       .replace(/\s+\w+:\w+="[^"]*"/g,'');
+      const xml = new DOMParser().parseFromString(kmlText,'text/xml');
+      if (xml.querySelector('parsererror')) throw new Error('File KML tidak valid.');
+
+      placerRoutes = [];
+      function gN(el){ for(const t of ['name','n']){const c=el.querySelector(':scope > '+t);if(c&&c.textContent.trim())return c.textContent.trim();}return ''; }
+      function pC(s){const p=s.trim().split(',');return p.length>=2?[parseFloat(p[0]),parseFloat(p[1])]:null;}
+
+      for (const pm of xml.querySelectorAll('Placemark')) {
+        const ls = pm.querySelector('LineString');
+        if (!ls) continue;
+        const ce = ls.querySelector('coordinates');
+        if (!ce) continue;
+        const pts = ce.textContent.trim().split(/\s+/).map(pC).filter(Boolean);
+        if (pts.length > 1) placerRoutes.push({ name: gN(pm)||`Route ${placerRoutes.length+1}`, points: pts });
+      }
+      if (!placerRoutes.length) throw new Error('Tidak ada route (LineString) ditemukan.');
+
+      const list = document.getElementById('routePickerList');
+      list.innerHTML = '';
+      placerRoutes.forEach((r,i)=>{
+        const disp = r.name.replace(/;/g,' – ');
+        const item = document.createElement('label');
+        item.className = 'route-picker-item';
+        item.innerHTML = `<input type="checkbox" id="rpm_${i}" value="${i}" checked onchange="updateRoutePickerLabel()"><label for="rpm_${i}">${disp}</label>`;
+        list.appendChild(item);
+      });
+      updateRoutePickerLabel();
+      document.getElementById('placerFileName').textContent = file.name;
+      document.getElementById('placerFileSize').textContent = (file.size/1024).toFixed(1)+' KB';
+      placerDrop.style.display = 'none';
+      document.getElementById('placerApp').style.display = 'block';
+      document.getElementById('placerResult').style.display = 'none';
+    } catch(e) { alert('Error: '+e.message); }
+  }
+
+  window.resetPlacer = function() {
+    placerRoutes=[]; generatedPMs=[];
+    placerDrop.style.display='block';
+    document.getElementById('placerApp').style.display='none';
+    document.getElementById('placerResult').style.display='none';
+    placerInput.value='';
+  };
+
+  window.updateNameUI = function() {
+    const mode = document.querySelector('input[name="pmNameMode"]:checked').value;
+    document.getElementById('nameBoxPrefix').style.display = mode==='prefix' ? 'flex' : 'none';
+    document.getElementById('nameBoxSame').style.display   = mode==='same'   ? 'flex' : 'none';
+  };
+
+  window.updatePrefixPreview = function() {
+    const p = document.getElementById('placerPrefix').value.trim()||'PM';
+    document.getElementById('prefixPreview').textContent = `${p}-001, ${p}-002, ...`;
+  };
+
+  // Interpolasi titik di sepanjang polyline dengan interval meter
+  // Setiap tiang = anchor, cosinus latitude dipakai untuk akurasi jarak
+  function interpolateRoute(points, intervalM, includeEndpoints) {
+    const result = [];
+    let accumulated = 0;
+    let nextTarget = includeEndpoints ? 0 : intervalM;
+    if (includeEndpoints) result.push({dist:0, lng:points[0][0], lat:points[0][1]});
+
+    for (let i=0; i<points.length-1; i++) {
+      const [ax,ay]=points[i], [bx,by]=points[i+1];
+      const cosLat=Math.cos(((ay+by)/2)*Math.PI/180);
+      const dx=(bx-ax)*cosLat*D2M, dy=(by-ay)*D2M;
+      const segLen=Math.hypot(dx,dy);
+      if (segLen===0) continue;
+      while (nextTarget <= accumulated+segLen) {
+        const t=(nextTarget-accumulated)/segLen;
+        result.push({dist:Math.round(nextTarget), lng:ax+(bx-ax)*t, lat:ay+(by-ay)*t});
+        nextTarget+=intervalM;
+      }
+      accumulated+=segLen;
+    }
+    if (includeEndpoints) {
+      const last=points[points.length-1];
+      const totalLen=Math.round(accumulated);
+      if (!result.length || Math.abs(result[result.length-1].dist-totalLen)>1)
+        result.push({dist:totalLen, lng:last[0], lat:last[1]});
+    }
+    return result;
+  }
+
+  window.generatePlacemarks = function() {
+    const intervalM = parseFloat(document.getElementById('placerInterval').value)||300;
+    const endpoints = document.getElementById('placerEndpoints').checked;
+    const mode      = document.querySelector('input[name="pmNameMode"]:checked').value;
+    const prefix    = document.getElementById('placerPrefix').value.trim()||'PM';
+    const sameName  = document.getElementById('placerSameName').value.trim()||'Tiang Baru';
+
+    // Ambil route yang dicentang
+    const checked = [...document.querySelectorAll('#routePickerList input[type=checkbox]:checked')];
+    const targets = checked.length > 0
+      ? checked.map(cb => placerRoutes[parseInt(cb.value)])
+      : placerRoutes; // fallback semua jika tidak ada yang dicentang
+
+    generatedPMs = [];
+    let counter = 1;
+    targets.forEach(route=>{
+      interpolateRoute(route.points, intervalM, endpoints).forEach(p=>{
+        generatedPMs.push({
+          name:      mode==='prefix' ? `${prefix}-${String(counter).padStart(3,'0')}` : sameName,
+          routeName: route.name.replace(/;/g,' – '),
+          dist: p.dist, lng: p.lng, lat: p.lat
+        });
+        counter++;
+      });
+    });
+
+    const tbody = document.getElementById('placerTbody');
+    tbody.innerHTML='';
+    generatedPMs.forEach((pm,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td style="color:var(--muted);font-size:0.73rem">${i+1}</td>
+        <td><input class="name-input-pm" value="${xE(pm.name)}" oninput="window._placerPMs[${i}].name=this.value"></td>
+        <td style="font-size:0.78rem;color:var(--muted)">${xE(pm.routeName)}</td>
+        <td class="r">${pm.dist.toLocaleString('id-ID')}</td>
+        <td class="mono">${pm.lng.toFixed(7)}</td>
+        <td class="mono">${pm.lat.toFixed(7)}</td>`;
+      tbody.appendChild(tr);
+    });
+    window._placerPMs = generatedPMs;
+    document.getElementById('placerResultTitle').textContent = `${generatedPMs.length} Placemark — interval ${intervalM}m`;
+    document.getElementById('placerResult').style.display='block';
+  };
+
+  window.downloadPlacerKmz = function() {
+    const pms = window._placerPMs || generatedPMs;
+    if (!pms.length) return;
+    const kml=`<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+  <name>KMZ Placer Result</name>
+  <Style id="pm-dot">
+    <IconStyle><color>ff0000ff</color><scale>0.9</scale>
+      <Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon>
+    </IconStyle>
+    <LabelStyle><scale>0.75</scale></LabelStyle>
+  </Style>
+  ${pms.map(pm=>`<Placemark>
+    <name>${xE(pm.name)}</name>
+    <styleUrl>#pm-dot</styleUrl>
+    <Point><coordinates>${pm.lng.toFixed(7)},${pm.lat.toFixed(7)},0</coordinates></Point>
+  </Placemark>`).join('\n  ')}
+</Document>
+</kml>`;
+    const zip=new JSZip();
+    zip.file('doc.kml', kml);
+    zip.generateAsync({type:'blob',compression:'DEFLATE'}).then(blob=>{
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download='placemark_result.kmz'; a.click();
+    });
+  };
+
+  function xE(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ── Route Picker helpers (exposed to global) ──
+  window.toggleRoutePicker = function() {
+    const dd = document.getElementById('routePickerDropdown');
+    const btn = document.getElementById('routePickerBtn');
+    const open = dd.style.display !== 'none';
+    dd.style.display = open ? 'none' : 'block';
+    btn.classList.toggle('open', !open);
+    if (!open) {
+      // close on outside click
+      setTimeout(()=>{ document.addEventListener('click', closePickerOutside, {once:true}); }, 0);
+    }
+  };
+  function closePickerOutside(e) {
+    const picker = document.getElementById('routePicker');
+    if (!picker.contains(e.target)) {
+      document.getElementById('routePickerDropdown').style.display = 'none';
+      document.getElementById('routePickerBtn').classList.remove('open');
+    }
+  }
+  window.selectAllRoutes = function() {
+    document.querySelectorAll('#routePickerList input[type=checkbox]').forEach(cb=>cb.checked=true);
+    updateRoutePickerLabel();
+  };
+  window.clearAllRoutes = function() {
+    document.querySelectorAll('#routePickerList input[type=checkbox]').forEach(cb=>cb.checked=false);
+    updateRoutePickerLabel();
+  };
+  window.updateRoutePickerLabel = function() {
+    const all  = document.querySelectorAll('#routePickerList input[type=checkbox]');
+    const chk  = document.querySelectorAll('#routePickerList input[type=checkbox]:checked');
+    const badge = document.getElementById('routePickerBadge');
+    const label = document.getElementById('routePickerLabel');
+    badge.textContent = chk.length;
+    if (chk.length === 0)        label.textContent = 'Tidak ada route dipilih';
+    else if (chk.length === all.length) label.textContent = 'Semua route dipilih';
+    else                         label.textContent = `${chk.length} dari ${all.length} route dipilih`;
+  };
+
+})(); // end Placer IIFE
 
 // ═══════════════════════════════════════════════════
 // KMZ SPLITTER
