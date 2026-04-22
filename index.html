@@ -130,10 +130,16 @@ body { background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans',
 .rtype-card.rt-nc::before { background:#1e40af; }
 .rtype-card.rt-cc::before { background:#7c3aed; }
 .rtype-card.rt-cp::before { background:#15803d; }
+.rtype-card.rt-ug::before { background:#d97706; }
+.rtype-card.rt-hh::before { background:#0891b2; }
 .rtype-num { font-size:1.6rem; font-weight:800; font-family:'JetBrains Mono',monospace; line-height:1; }
 .rtype-card.rt-nc .rtype-num { color:#1e40af; }
 .rtype-card.rt-cc .rtype-num { color:#7c3aed; }
 .rtype-card.rt-cp .rtype-num { color:#15803d; }
+.rtype-card.rt-ug .rtype-num { color:#d97706; }
+.rtype-card.rt-hh .rtype-num { color:#0891b2; }
+.rt-ug .rtype-pill { background:#fef3c7; color:#d97706; }
+.rt-hh .rtype-pill { background:#e0f2fe; color:#0891b2; }
 .rtype-sub { font-size:0.72rem; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:0.25rem; }
 .rtype-lbl { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:0.4rem; }
 .rtype-seg { font-size:0.7rem; color:var(--muted); margin-top:0.3rem; }
@@ -431,6 +437,11 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
         <div class="s-card" style="border-top:none;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f59e0b"></div><div class="s-num" id="statTE" style="color:#b45309">-</div><div class="s-lbl">Total Tiang Existing (TE)</div></div>
         <div class="s-card ch"><div class="s-num" id="statH">-</div><div class="s-lbl">Total Hanger</div></div>
         <div class="s-card cu"><div class="s-num" id="statU">-</div><div class="s-lbl">Pole Tak Terdeteksi</div></div>
+        <div class="s-card" style="border-top:none;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:#0891b2"></div><div class="s-num" id="statHH" style="color:#0891b2">-</div><div class="s-lbl">Total Handhole</div></div>
+        <div class="s-card" style="border-top:none;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:#0e7490"></div><div class="s-num" id="statHHNew" style="color:#0e7490">-</div><div class="s-lbl">HH New</div></div>
+        <div class="s-card" style="border-top:none;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:#6366f1"></div><div class="s-num" id="statHHExt" style="color:#6366f1">-</div><div class="s-lbl">HH Existing</div></div>
+        <div class="s-card" style="border-top:none;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:#be185d"></div><div class="s-num" id="statMP" style="color:#be185d">-</div><div class="s-lbl">Marking POS</div></div>
+        <div class="s-card" style="border-top:none;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:#d97706"></div><div class="s-num" id="statUG" style="color:#d97706;font-size:1.2rem">-</div><div class="s-lbl">Panjang UG Cable (m)</div></div>
       </div>
 
       <div class="sec-ttl">Panjang Route per Tipe Kabel</div>
@@ -456,6 +467,44 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
           <div class="rtype-seg" id="rtSegCP">0 segmen</div>
           <span class="rtype-pill">Collo Pole</span>
         </div>
+        <div class="rtype-card rt-ug">
+          <div class="rtype-lbl">🟠 UG Cable</div>
+          <div class="rtype-num" id="rtLenUG">0</div>
+          <div class="rtype-sub" id="rtSubUG">0 m total</div>
+          <div class="rtype-seg" id="rtSegUG">0 segmen</div>
+          <span class="rtype-pill">Underground</span>
+        </div>
+        <div class="rtype-card rt-hh">
+          <div class="rtype-lbl">🔷 Handhole (Total)</div>
+          <div class="rtype-num" id="rtCntHH">0</div>
+          <div class="rtype-sub" id="rtSubHH">0 titik</div>
+          <div class="rtype-seg" id="rtSegHH">Titik akses UG</div>
+          <span class="rtype-pill">Point</span>
+        </div>
+        <div class="rtype-card" style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.3rem;box-shadow:var(--shadow);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#0e7490"></div>
+          <div class="rtype-lbl">🆕 HH New</div>
+          <div class="rtype-num" id="rtCntHHNew" style="color:#0e7490">0</div>
+          <div class="rtype-sub" id="rtSubHHNew" style="color:#0e7490">0 titik</div>
+          <div class="rtype-seg">Handhole Baru</div>
+          <span class="rtype-pill" style="background:#cffafe;color:#0e7490">New</span>
+        </div>
+        <div class="rtype-card" style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.3rem;box-shadow:var(--shadow);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#6366f1"></div>
+          <div class="rtype-lbl">♻️ HH Existing</div>
+          <div class="rtype-num" id="rtCntHHExt" style="color:#6366f1">0</div>
+          <div class="rtype-sub" id="rtSubHHExt" style="color:#6366f1">0 titik</div>
+          <div class="rtype-seg">Handhole Existing</div>
+          <span class="rtype-pill" style="background:#e0e7ff;color:#6366f1">Existing</span>
+        </div>
+        <div class="rtype-card" style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.3rem;box-shadow:var(--shadow);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:#be185d"></div>
+          <div class="rtype-lbl">📍 Marking POS</div>
+          <div class="rtype-num" id="rtCntMP" style="color:#be185d">0</div>
+          <div class="rtype-sub" id="rtSubMP" style="color:#be185d">0 titik</div>
+          <div class="rtype-seg">Titik Marking</div>
+          <span class="rtype-pill" style="background:#fce7f3;color:#be185d">POS</span>
+        </div>
       </div>
 
       <div class="sec-ttl">Detail Per Segmen Route</div>
@@ -475,6 +524,78 @@ tr.row-tot td { background:#f0fdf4; font-weight:800; color:var(--green); font-si
           </thead>
           <tbody id="kmzTbody"></tbody>
         </table>
+      </div>
+
+      <!-- UG Cable Detail Table -->
+      <div id="ugCableSection" style="display:none;margin-bottom:1.5rem">
+        <div class="sec-ttl">Detail Segmen UG Cable</div>
+        <div class="kmz-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Segmen</th>
+                <th class="num" style="color:#fbbf24">Panjang (m)</th>
+              </tr>
+            </thead>
+            <tbody id="ugCableTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Handhole Info -->
+      <div id="hhSection" style="display:none;margin-bottom:1.5rem">
+        <div class="sec-ttl">Handhole</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;margin-bottom:0.8rem">
+          <div style="background:#e0f2fe;border:1px solid #7dd3fc;border-radius:10px;padding:0.9rem 1.3rem;font-size:0.85rem;color:#0891b2;display:flex;align-items:center;gap:0.7rem">
+            <span style="font-size:1.4rem">🔷</span>
+            <div><div style="font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace" id="hhTotalNum">0</div><div id="hhCountLabel">titik handhole total</div></div>
+          </div>
+          <div style="background:#cffafe;border:1px solid #67e8f9;border-radius:10px;padding:0.9rem 1.3rem;font-size:0.85rem;color:#0e7490;display:flex;align-items:center;gap:0.7rem">
+            <span style="font-size:1.4rem">🆕</span>
+            <div><div style="font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace" id="hhNewNum">0</div><div>HH New</div></div>
+          </div>
+          <div style="background:#e0e7ff;border:1px solid #a5b4fc;border-radius:10px;padding:0.9rem 1.3rem;font-size:0.85rem;color:#6366f1;display:flex;align-items:center;gap:0.7rem">
+            <span style="font-size:1.4rem">♻️</span>
+            <div><div style="font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace" id="hhExtNum">0</div><div>HH Existing</div></div>
+          </div>
+        </div>
+        <div class="kmz-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama</th>
+                <th>Tipe</th>
+                <th class="num">Longitude</th>
+                <th class="num">Latitude</th>
+              </tr>
+            </thead>
+            <tbody id="hhTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Marking POS Info -->
+      <div id="mpSection" style="display:none;margin-bottom:1.5rem">
+        <div class="sec-ttl">Marking POS</div>
+        <div style="background:#fce7f3;border:1px solid #f9a8d4;border-radius:10px;padding:0.9rem 1.3rem;font-size:0.85rem;color:#be185d;display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem">
+          <span style="font-size:1.4rem">📍</span>
+          <div><div style="font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace" id="mpTotalNum">0</div><div id="mpCountLabel">titik marking POS terdeteksi</div></div>
+        </div>
+        <div class="kmz-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama</th>
+                <th class="num">Longitude</th>
+                <th class="num">Latitude</th>
+              </tr>
+            </thead>
+            <tbody id="mpTbody"></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="footer-n" id="footerN"></div>
@@ -907,7 +1028,7 @@ function kmlName(el) {
 }
 
 function parseKml(xml) {
-  const data = { routes:[], poles:{p7:[],p9:[],te:[]}, hangers:[] };
+  const data = { routes:[], poles:{p7:[],p9:[],te:[]}, hangers:[], handholes:[], hhNew:[], hhExt:[], markingPos:[], ugcables:[] };
 
   // Cari folder HANYA di main folder (level Route/Hanger/Pole), bukan deep search
   // agar tidak ikut membaca folder yang sama di dalam per-segmen
@@ -1039,6 +1160,75 @@ function parseKml(xml) {
   data.poles.p9 = collectPts(findNestedFolder('Pole','Pole 9'));
   data.poles.te = collectPts(findNestedFolder('Pole','Existing Pole'));
   data.hangers  = collectPts(findMainFolder('Hanger'));
+
+  // findDeepFolder: cari folder dengan keyword di SEMUA level (recursive)
+  function findDeepFolder(kw, startNode) {
+    const root = startNode || xml.querySelector('Document') || xml;
+    const kwL = kw.toLowerCase();
+    for (const f of root.querySelectorAll('Folder')) {
+      if (kmlName(f).toLowerCase().includes(kwL)) return f;
+    }
+    return null;
+  }
+
+  // Handhole: kumpulkan semua Point dari folder Handhole, pisahkan NEW vs EXT
+  function collectPtsWithName(folder) {
+    const res = [];
+    if (!folder) return res;
+    for (const pm of folder.querySelectorAll(':scope > Placemark')) {
+      const ce = pm.querySelector('coordinates');
+      if (ce) {
+        const name = kmlName(pm);
+        ce.textContent.trim().split(/\s+/).map(parseCoord).filter(Boolean).forEach(p => res.push({coord: p, name: name}));
+      }
+    }
+    return res;
+  }
+  const hhFolder = findMainFolder('Handhole') || findMainFolder('handhole') || findMainFolder('HH') || findDeepFolder('Handhole') || findDeepFolder('handhole');
+  const hhAllWithName = collectPtsWithName(hhFolder);
+  data.handholes = hhAllWithName.map(x => x.coord);
+  data.hhNew = hhAllWithName.filter(x => x.name.toUpperCase().includes('NEW HH'));
+  data.hhExt = hhAllWithName.filter(x => x.name.toUpperCase().includes('EXT HH'));
+  // Handhole yang tidak terklasifikasi masuk ke hhNew (fallback)
+  hhAllWithName.filter(x => !x.name.toUpperCase().includes('NEW HH') && !x.name.toUpperCase().includes('EXT HH')).forEach(x => data.hhNew.push(x));
+
+  // MARKING POS: kumpulkan dari folder MARKING POS
+  function collectPtsWithNameDeep(folder) {
+    const res = [];
+    if (!folder) return res;
+    for (const pm of folder.querySelectorAll('Placemark')) {
+      const ce = pm.querySelector('coordinates');
+      if (ce) {
+        const name = kmlName(pm);
+        ce.textContent.trim().split(/\s+/).map(parseCoord).filter(Boolean).forEach(p => res.push({coord: p, name: name}));
+      }
+    }
+    return res;
+  }
+  const mpFolder = findMainFolder('MARKING POS') || findMainFolder('Marking Pos') || findMainFolder('marking pos') || findDeepFolder('MARKING POS') || findDeepFolder('Marking Pos') || findDeepFolder('marking pos');
+  data.markingPos = collectPtsWithNameDeep(mpFolder);
+
+  // UG Cable: cari folder UG Cable di semua level (karena bisa nested dalam Route)
+  function collectUGRoutes(folder) {
+    const res = [];
+    if (!folder) return res;
+    for (const pm of folder.querySelectorAll('Placemark')) {
+      const ls = pm.querySelector('LineString');
+      if (!ls) continue;
+      const coordEl = ls.querySelector('coordinates');
+      if (!coordEl) continue;
+      const raw = coordEl.textContent.trim().split(/\s+/);
+      const pts = raw.map(p => { const c = p.split(','); return c.length >= 2 ? [parseFloat(c[0]), parseFloat(c[1])] : null; }).filter(Boolean);
+      if (pts.length > 1) res.push({ name: kmlName(pm) || 'UG Cable', points: pts });
+    }
+    return res;
+  }
+  const ugFolder = findMainFolder('UG Cable') || findMainFolder('UGCable') || findMainFolder('ug cable')
+                || findMainFolder('Underground Cable') || findMainFolder('UG')
+                || findDeepFolder('UG Cable') || findDeepFolder('UGCable')
+                || findDeepFolder('ug cable') || findDeepFolder('Underground Cable');
+  data.ugcables = collectUGRoutes(ugFolder);
+
   return data;
 }
 
@@ -1087,18 +1277,31 @@ function renderKmz(data, tol) {
   document.getElementById('kmzContent').style.display='none';
   setTimeout(()=>{
     try {
-      const {routes,poles,hangers}=data;
+      const {routes,poles,hangers,handholes,hhNew,hhExt,markingPos,ugcables}=data;
       const p7=assign(poles.p7,routes,tol);
       const p9=assign(poles.p9,routes,tol);
       const te=assign(poles.te||[],routes,tol);
       const hg=assign(hangers,routes,tol);
+
+      // Hitung total panjang UG Cable
+      const ugLengths = (ugcables||[]).map(u=>polyLen(u.points));
+      const ugTotalLen = ugLengths.reduce((a,b)=>a+b,0);
+      const hhCount = (handholes||[]).length;
+      const hhNewCount = (hhNew||[]).length;
+      const hhExtCount = (hhExt||[]).length;
+      const mpCount = (markingPos||[]).length;
 
       // Store computed results for import
       kmzResults = {
         routes: routes,
         p7counts: p7.counts, p9counts: p9.counts, tecounts: te.counts, hgcounts: hg.counts,
         lengths: routes.map(r=>polyLen(r.points)),
-        unmatched: p7.unm+p9.unm+te.unm
+        unmatched: p7.unm+p9.unm+te.unm,
+        ugcables: ugcables||[], ugLengths, ugTotalLen,
+        handholes: handholes||[], hhCount,
+        hhNew: hhNew||[], hhNewCount,
+        hhExt: hhExt||[], hhExtCount,
+        markingPos: markingPos||[], mpCount
       };
 
       document.getElementById('statR').textContent = routes.length;
@@ -1106,6 +1309,11 @@ function renderKmz(data, tol) {
       document.getElementById('statTE').textContent = (poles.te||[]).length;
       document.getElementById('statH').textContent = hangers.length;
       document.getElementById('statU').textContent = p7.unm+p9.unm+te.unm;
+      document.getElementById('statHH').textContent = hhCount;
+      document.getElementById('statHHNew').textContent = hhNewCount;
+      document.getElementById('statHHExt').textContent = hhExtCount;
+      document.getElementById('statMP').textContent = mpCount;
+      document.getElementById('statUG').textContent = ugTotalLen.toLocaleString('id-ID');
 
       const tbody = document.getElementById('kmzTbody');
       tbody.innerHTML='';
@@ -1164,9 +1372,100 @@ function renderKmz(data, tol) {
       document.getElementById('rtLenCP').textContent=cp.len.toLocaleString('id-ID');
       document.getElementById('rtSubCP').textContent=fmtLen(cp.len)+' total';
       document.getElementById('rtSegCP').textContent=cp.seg+' segmen';
+      // UG Cable
+      document.getElementById('rtLenUG').textContent=ugTotalLen.toLocaleString('id-ID');
+      document.getElementById('rtSubUG').textContent=fmtLen(ugTotalLen)+' total';
+      document.getElementById('rtSegUG').textContent=(ugcables||[]).length+' segmen';
+      // Handhole
+      document.getElementById('rtCntHH').textContent=hhCount;
+      document.getElementById('rtSubHH').textContent=hhCount+' titik';
+      document.getElementById('rtCntHHNew').textContent=hhNewCount;
+      document.getElementById('rtSubHHNew').textContent=hhNewCount+' titik';
+      document.getElementById('rtCntHHExt').textContent=hhExtCount;
+      document.getElementById('rtSubHHExt').textContent=hhExtCount+' titik';
+      document.getElementById('rtCntMP').textContent=mpCount;
+      document.getElementById('rtSubMP').textContent=mpCount+' titik';
       tbody.appendChild(trT);
 
-      document.getElementById('footerN').textContent=`Toleransi: ${tol}m | ${p7.unm+p9.unm+te.unm} pole tidak terdeteksi di route manapun`;
+      // Tambah tabel UG Cable jika ada
+      const ugSection = document.getElementById('ugCableSection');
+      if (ugSection) {
+        if ((ugcables||[]).length > 0) {
+          let ugHtml = '';
+          ugcables.forEach((u,i) => {
+            ugHtml += `<tr>
+              <td class="idx-c">${i+1}</td>
+              <td class="rn">${u.name}</td>
+              <td class="num" style="color:#d97706;font-weight:600">${ugLengths[i].toLocaleString('id-ID')}</td>
+            </tr>`;
+          });
+          const ugTotalRow = `<tr style="background:#fff7ed;font-weight:700;border-top:2px solid var(--border2)">
+            <td class="idx-c">—</td><td style="font-weight:800">TOTAL UG Cable</td>
+            <td class="num" style="color:#d97706;font-weight:700">${ugTotalLen.toLocaleString('id-ID')}</td>
+          </tr>`;
+          document.getElementById('ugCableTbody').innerHTML = ugHtml + ugTotalRow;
+          ugSection.style.display = 'block';
+        } else {
+          ugSection.style.display = 'none';
+        }
+      }
+
+      // Tambah tabel Handhole jika ada
+      const hhSection = document.getElementById('hhSection');
+      if (hhSection) {
+        hhSection.style.display = hhCount > 0 ? 'block' : 'none';
+        if (hhCount > 0) {
+          document.getElementById('hhCountLabel').textContent = 'titik handhole total dari folder "Handhole"';
+          document.getElementById('hhTotalNum').textContent = hhCount;
+          document.getElementById('hhNewNum').textContent = hhNewCount;
+          document.getElementById('hhExtNum').textContent = hhExtCount;
+          const hhTbody = document.getElementById('hhTbody');
+          let hhHtml = '';
+          let hhIdx = 1;
+          (hhNew||[]).forEach(x => {
+            hhHtml += `<tr>
+              <td class="idx-c">${hhIdx++}</td>
+              <td>${x.name}</td>
+              <td><span style="display:inline-block;font-size:0.68rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:#cffafe;color:#0e7490">🆕 NEW</span></td>
+              <td class="num" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${x.coord[0].toFixed(6)}</td>
+              <td class="num" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${x.coord[1].toFixed(6)}</td>
+            </tr>`;
+          });
+          (hhExt||[]).forEach(x => {
+            hhHtml += `<tr>
+              <td class="idx-c">${hhIdx++}</td>
+              <td>${x.name}</td>
+              <td><span style="display:inline-block;font-size:0.68rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:#e0e7ff;color:#6366f1">♻️ EXT</span></td>
+              <td class="num" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${x.coord[0].toFixed(6)}</td>
+              <td class="num" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${x.coord[1].toFixed(6)}</td>
+            </tr>`;
+          });
+          if (hhTbody) hhTbody.innerHTML = hhHtml;
+        }
+      }
+
+      // Tambah tabel Marking POS jika ada
+      const mpSection = document.getElementById('mpSection');
+      if (mpSection) {
+        mpSection.style.display = mpCount > 0 ? 'block' : 'none';
+        if (mpCount > 0) {
+          document.getElementById('mpTotalNum').textContent = mpCount;
+          document.getElementById('mpCountLabel').textContent = 'titik marking POS terdeteksi';
+          const mpTbody = document.getElementById('mpTbody');
+          let mpHtml = '';
+          (markingPos||[]).forEach((x, i) => {
+            mpHtml += `<tr>
+              <td class="idx-c">${i+1}</td>
+              <td>${x.name}</td>
+              <td class="num" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${x.coord[0].toFixed(6)}</td>
+              <td class="num" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${x.coord[1].toFixed(6)}</td>
+            </tr>`;
+          });
+          if (mpTbody) mpTbody.innerHTML = mpHtml;
+        }
+      }
+
+      document.getElementById('footerN').textContent=`Toleransi: ${tol}m | ${p7.unm+p9.unm+te.unm} pole tidak terdeteksi | UG Cable: ${fmtLen(ugTotalLen)} | HH Total: ${hhCount} (New: ${hhNewCount}, Ext: ${hhExtCount}) | Marking POS: ${mpCount}`;
       document.getElementById('loadBox').style.display='none';
       document.getElementById('kmzContent').style.display='block';
     } catch(err){
@@ -1714,6 +2013,86 @@ function exportKabelCSV(){
 
   XLSX.utils.book_append_sheet(wb, ws, 'Data Kabel');
 
+  // ── Sheet UG Cable (jika ada) ──
+  if (kmzResults && kmzResults.ugcables && kmzResults.ugcables.length > 0) {
+    const ug_data = [];
+    ug_data.push(['Data UG Cable']);
+    ug_data.push(['Pekerjaan', name]);
+    ug_data.push([]);
+    ug_data.push(['No', 'Nama Segmen', 'Panjang (m)']);
+    const ugHdrIdx = ug_data.length;
+    kmzResults.ugcables.forEach((u, i) => {
+      ug_data.push([i + 1, u.name, kmzResults.ugLengths[i]]);
+    });
+    ug_data.push(['', 'TOTAL', kmzResults.ugTotalLen]);
+    const ws_ug = XLSX.utils.aoa_to_sheet(ug_data);
+    ws_ug['!cols'] = [{ wch: 5 }, { wch: 36 }, { wch: 18 }];
+    // Header style
+    for (let c = 0; c < 3; c++) {
+      const ca = XLSX.utils.encode_cell({ r: ugHdrIdx - 1, c });
+      if (!ws_ug[ca]) ws_ug[ca] = { v: '', t: 's' };
+      ws_ug[ca].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '92400E' } }, alignment: { horizontal: 'center' } };
+    }
+    // Total row style
+    const ugTotR = ug_data.length - 1;
+    for (let c = 0; c < 3; c++) {
+      const ca = XLSX.utils.encode_cell({ r: ugTotR, c });
+      if (!ws_ug[ca]) ws_ug[ca] = { v: '', t: 's' };
+      ws_ug[ca].s = { font: { bold: true, color: { rgb: 'D97706' } }, fill: { fgColor: { rgb: 'FFFBEB' } }, alignment: { horizontal: c <= 1 ? 'left' : 'right' } };
+    }
+    XLSX.utils.book_append_sheet(wb, ws_ug, 'UG Cable');
+  }
+
+  // ── Sheet Handhole (jika ada) ──
+  if (kmzResults && kmzResults.hhCount > 0) {
+    const hh_data = [];
+    hh_data.push(['Data Handhole']);
+    hh_data.push(['Pekerjaan', name]);
+    hh_data.push([]);
+    hh_data.push(['Total Handhole', kmzResults.hhCount, 'titik', '', 'HH New', kmzResults.hhNewCount, 'titik', '', 'HH Existing', kmzResults.hhExtCount, 'titik']);
+    hh_data.push([]);
+    hh_data.push(['No', 'Nama', 'Tipe', 'Longitude', 'Latitude']);
+    const hhHdrIdx = hh_data.length;
+    let hhRowIdx = 1;
+    (kmzResults.hhNew||[]).forEach(x => {
+      hh_data.push([hhRowIdx++, x.name, 'NEW', x.coord[0], x.coord[1]]);
+    });
+    (kmzResults.hhExt||[]).forEach(x => {
+      hh_data.push([hhRowIdx++, x.name, 'EXISTING', x.coord[0], x.coord[1]]);
+    });
+    const ws_hh = XLSX.utils.aoa_to_sheet(hh_data);
+    ws_hh['!cols'] = [{ wch: 5 }, { wch: 28 }, { wch: 10 }, { wch: 16 }, { wch: 16 }];
+    for (let c = 0; c < 5; c++) {
+      const ca = XLSX.utils.encode_cell({ r: hhHdrIdx - 1, c });
+      if (!ws_hh[ca]) ws_hh[ca] = { v: '', t: 's' };
+      ws_hh[ca].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '0C4A6E' } }, alignment: { horizontal: 'center' } };
+    }
+    XLSX.utils.book_append_sheet(wb, ws_hh, 'Handhole');
+  }
+
+  // ── Sheet Marking POS (jika ada) ──
+  if (kmzResults && kmzResults.mpCount > 0) {
+    const mp_data = [];
+    mp_data.push(['Data Marking POS']);
+    mp_data.push(['Pekerjaan', name]);
+    mp_data.push([]);
+    mp_data.push(['Total Marking POS', kmzResults.mpCount, 'titik']);
+    mp_data.push([]);
+    mp_data.push(['No', 'Nama', 'Longitude', 'Latitude']);
+    const mpHdrIdx = mp_data.length;
+    (kmzResults.markingPos||[]).forEach((x, i) => {
+      mp_data.push([i + 1, x.name, x.coord[0], x.coord[1]]);
+    });
+    const ws_mp = XLSX.utils.aoa_to_sheet(mp_data);
+    ws_mp['!cols'] = [{ wch: 5 }, { wch: 32 }, { wch: 16 }, { wch: 16 }];
+    for (let c = 0; c < 4; c++) {
+      const ca = XLSX.utils.encode_cell({ r: mpHdrIdx - 1, c });
+      if (!ws_mp[ca]) ws_mp[ca] = { v: '', t: 's' };
+      ws_mp[ca].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '831843' } }, alignment: { horizontal: 'center' } };
+    }
+    XLSX.utils.book_append_sheet(wb, ws_mp, 'Marking POS');
+  }
+
   // ── Write and download ──
   XLSX.writeFile(wb, `DataKabel_${name.replace(/\s+/g, '_')}.xlsx`);
 }
@@ -2130,6 +2509,7 @@ function parseSplitKml(raw) {
   const otbF     = findFExact(mainF,'OTB');
   const odpF     = findFExact(mainF,'ODP');
   const hhF      = findFExact(mainF,'Handhole');
+  const mpF      = findFExact(mainF,'MARKING POS') || findFExact(mainF,'Marking Pos') || findFExact(mainF,'marking pos');
 
   // Gabungkan nc_segments + colo_segs yang tidak duplikat nama
   // Setiap segmen punya property: type = 'nc' | 'colo'
@@ -2163,6 +2543,7 @@ function parseSplitKml(raw) {
     odp:         collectPts(odpF),
     otb:         collectPts(otbF),
     handhole:    collectPts(hhF),
+    markingPos:  collectPts(mpF),
     newClosure:  collectPts(closeF ? findFExact(closeF,'New Closure') : null),
     exClosure:   collectPts(closeF ? findFExact(closeF,'Existing Closure') : null),
     rawRoute:    routeF   ? routeF.outerHTML   : null,
@@ -2172,7 +2553,8 @@ function parseSplitKml(raw) {
     rawOtb:      otbF     ? otbF.outerHTML     : null,
     rawPole:     poleF    ? poleF.outerHTML    : null,
     rawOdp:      odpF     ? odpF.outerHTML     : null,
-    rawHandhole: hhF      ? hhF.outerHTML      : null,
+    rawHandhole:  hhF      ? hhF.outerHTML      : null,
+    rawMarkingPos: mpF     ? mpF.outerHTML      : null,
   };
 }
 
@@ -2207,6 +2589,7 @@ function assignSplitAll(data) {
     exPole:  _assign(data.exPole,   segs),
     otb:     _assign(data.otb,      segs),
     handhole:_assign(data.handhole, segs),
+    markingPos:_assign(data.markingPos, segs),
     newClosure:_assign(data.newClosure,segs),
     exClosure: _assign(data.exClosure, segs),
   };
@@ -2248,13 +2631,14 @@ function buildSplitKml(data, assigned) {
         fdr('Existing Pole', pms(assigned.exPole[i]))
       ),
       fdr('ODP',      pms(assigned.odp[i])),
-      fdr('Handhole', pms(assigned.handhole[i]))
+      fdr('Handhole', pms(assigned.handhole[i])),
+      fdr('MARKING POS', pms(assigned.markingPos[i]))
     );
   }
 
   // Original folders
   const origFolders = [data.rawRoute,data.rawClosure,data.rawSite,data.rawHanger,
-    data.rawOtb,data.rawPole,data.rawOdp,data.rawHandhole].filter(Boolean).join('');
+    data.rawOtb,data.rawPole,data.rawOdp,data.rawHandhole,data.rawMarkingPos].filter(Boolean).join('');
 
   // Seg 0 inside main folder, rest at Document level
   const mainFolder = `<Folder><name>${ex(data.mainName)}</name>${origFolders}${buildSeg(0)}</Folder>`;
